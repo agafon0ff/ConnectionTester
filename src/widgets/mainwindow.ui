@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>655</width>
+    <height>546</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ConnectionTester</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidgetCentral">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>655</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuNew">
+    <property name="title">
+     <string>New</string>
+    </property>
+    <addaction name="actionTcpServer"/>
+    <addaction name="actionTcpSocket"/>
+    <addaction name="actionUdpSocket"/>
+   </widget>
+   <widget class="QMenu" name="menuSession">
+    <property name="title">
+     <string>Session</string>
+    </property>
+    <addaction name="actionLoadSession"/>
+    <addaction name="actionSaveSession"/>
+   </widget>
+   <widget class="QMenu" name="menuScripts">
+    <property name="title">
+     <string>Scripts</string>
+    </property>
+    <addaction name="actionLoadScript"/>
+    <addaction name="actionSave_Script"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuNew"/>
+   <addaction name="menuSession"/>
+   <addaction name="menuScripts"/>
+  </widget>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_cross.png</normaloff>:/icon_cross.png</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionTcpServer">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_plus.png</normaloff>:/icon_plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>TCP Server</string>
+   </property>
+  </action>
+  <action name="actionTcpSocket">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_plus.png</normaloff>:/icon_plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>TCP Socket</string>
+   </property>
+  </action>
+  <action name="actionUdpSocket">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_plus.png</normaloff>:/icon_plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>UDP Socket</string>
+   </property>
+  </action>
+  <action name="actionLoadSession">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_folder.png</normaloff>:/icon_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load Session</string>
+   </property>
+  </action>
+  <action name="actionSaveSession">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_save.png</normaloff>:/icon_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Session</string>
+   </property>
+  </action>
+  <action name="actionLoadScript">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_folder.png</normaloff>:/icon_folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load Script</string>
+   </property>
+  </action>
+  <action name="actionSave_Script">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_save.png</normaloff>:/icon_save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Script</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../../res/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

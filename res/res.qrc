@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Calibri.ttf</file>
+        <file>icon_check.png</file>
+        <file>icon_copy.png</file>
+        <file>icon_cross.png</file>
+        <file>icon_edit.png</file>
+        <file>icon_folder.png</file>
+        <file>icon_left.png</file>
+        <file>icon_ok.png</file>
+        <file>icon_pause.png</file>
+        <file>icon_play.png</file>
+        <file>icon_plus.png</file>
+        <file>icon_right.png</file>
+        <file>icon_rows.png</file>
+        <file>icon_settings.png</file>
+        <file>icon_stop.png</file>
+        <file>icon_triangle.png</file>
+        <file>icons.xcf</file>
+        <file>style.css</file>
+        <file>Ubuntu-L.ttf</file>
+        <file>connection.ico</file>
+        <file>icon_trash.png</file>
+        <file>templates.js</file>
+        <file>icon_save.png</file>
+    </qresource>
+</RCC>
