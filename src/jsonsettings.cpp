@@ -94,35 +94,18 @@ QJsonObject JsonSettings::loadJson(const QString &fileName)
 {
     QByteArray jsonData;
     QFile configFile(fileName);
-    QFile backupFile(fileName+"~");
 
-    if(configFile.open(QIODevice::ReadOnly))
-    {
-        jsonData = configFile.readAll();
-        configFile.close();
-    }
+    if (!configFile.open(QIODevice::ReadOnly))
+        return QJsonObject();
+
+    jsonData = configFile.readAll();
+    configFile.close();
 
     QJsonParseError jsonError;
     QJsonObject jResult = QJsonDocument::fromJson(jsonData,&jsonError).object();
 
-    if(jsonError.error != QJsonParseError::NoError)
-    {
-        if(backupFile.open(QIODevice::ReadOnly))
-        {
-            jsonData = backupFile.readAll();
-            backupFile.close();
-        }
-    }
-
-    jResult = QJsonDocument::fromJson(jsonData,&jsonError).object();
-    if(jsonError.error != QJsonParseError::NoError)
+    if (jsonError.error != QJsonParseError::NoError)
         return QJsonObject();
-
-    if(backupFile.open(QIODevice::WriteOnly))
-    {
-        backupFile.write(jsonData);
-        backupFile.close();
-    }
 
     return jResult;
 }

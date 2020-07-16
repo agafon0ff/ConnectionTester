@@ -24,9 +24,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clear);
     connect(ui->btnClearOutput, &QPushButton::clicked, ui->textEditOutput, &QTextEdit::clear);
     connect(ui->btnSend, &QPushButton::clicked, this, &ConnectionWidget::onSendClicked);
-    connect(ui->btnAddScript, &QToolButton::clicked, this, &ConnectionWidget::onAddScriptClicked);
-    connect(ui->btnEditScript, &QToolButton::clicked, this, &ConnectionWidget::onEditScriptClicked);
-    connect(ui->btnRemoveScript, &QToolButton::clicked, this, &ConnectionWidget::onRemoveScriptClicked);
+    connect(ui->btnScriptMenu, &QToolButton::pressed, this, &ConnectionWidget::showScriptMenu);
 
     connect(ui->checkBoxShowText, &QCheckBox::clicked, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->checkBoxShowHex, &QCheckBox::clicked, this, &ConnectionWidget::onSettingsChanged);
@@ -128,7 +126,7 @@ void ConnectionWidget::setSettings(const NetSettingsStruct &settings)
 
 NetSettingsStruct ConnectionWidget::settings()
 {
-    NetSettingsStruct netSettings;
+    NetSettingsStruct netSettings = m_netConnection->settings();
     netSettings.splitterH = TwoNumbers(ui->splitterH->sizes().at(0),
                                        ui->splitterH->sizes().at(1));
     netSettings.splitterV = TwoNumbers(ui->splitterV->sizes().at(0),
@@ -221,8 +219,7 @@ void ConnectionWidget::setDatagram(const QByteArray &data, const QString &host, 
 
 void ConnectionWidget::onSettingsChanged()
 {
-    if (!m_netConnection)
-        return;
+    if (!m_netConnection) return;
 
     NetSettingsStruct settings;
     settings.autoStart = ui->checkBoxAutoStart->isChecked();
@@ -298,9 +295,7 @@ void ConnectionWidget::onEditScriptClicked()
     m_scriptEditor->setScriptText(scriptText);
 
     if (m_scriptEditor->exec() != QDialog::Accepted) return;
-
-    if(m_scriptEditor->scriptName().isEmpty())
-        return;
+    if(m_scriptEditor->scriptName().isEmpty()) return;
 
     m_netConnection->removeScript(scriptName);
     scriptName = m_scriptEditor->scriptName();

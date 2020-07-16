@@ -408,35 +408,13 @@
            </spacer>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddScript">
+           <widget class="QToolButton" name="btnScriptMenu">
             <property name="text">
              <string>+</string>
             </property>
             <property name="icon">
              <iconset resource="../../res/res.qrc">
-              <normaloff>:/icon_plus.png</normaloff>:/icon_plus.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnEditScript">
-            <property name="text">
-             <string>@</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../../res/res.qrc">
-              <normaloff>:/icon_edit.png</normaloff>:/icon_edit.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnRemoveScript">
-            <property name="text">
-             <string>-</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../../res/res.qrc">
-              <normaloff>:/icon_cross.png</normaloff>:/icon_cross.png</iconset>
+              <normaloff>:/icon_rows.png</normaloff>:/icon_rows.png</iconset>
             </property>
            </widget>
           </item>

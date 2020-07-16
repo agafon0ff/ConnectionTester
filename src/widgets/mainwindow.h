@@ -33,6 +33,7 @@ private slots:
     void onTabCloseRequested(int index);
 
     void setDefaultConnectionSettings(int type, const NetSettingsStruct &settings);
+    void onScriptsMenuRequested();
 
     void closeAllTabs();
 

@@ -9,6 +9,7 @@
 #include <QCloseEvent>
 #include <QDebug>
 #include <QFile>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -30,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionUdpSocket, &QAction::triggered, [=]{addConnection(ConnectionUdpSocket);});
     connect(ui->actionSaveSession, &QAction::triggered, this, &MainWindow::saveSession);
     connect(ui->actionLoadSession, &QAction::triggered, this, &MainWindow::loadSession);
+    connect(ui->menuScripts, &QMenu::aboutToShow, this, &MainWindow::onScriptsMenuRequested);
 
     loadSettings();
 }
@@ -83,6 +85,7 @@ ConnectionWidget *MainWindow::createConnection(int type, const NetSettingsStruct
     widget->setScriptEditor(m_scriptEditor);
 
     connect(widget, &ConnectionWidget::defaultSettings, this, &MainWindow::setDefaultConnectionSettings);
+    connect(widget, &ConnectionWidget::showScriptMenu, this, &MainWindow::onScriptsMenuRequested);
 
     ui->tabWidgetCentral->addTab(widget, netConnection->getTypeString());
     ui->tabWidgetCentral->setCurrentWidget(widget);
@@ -113,6 +116,15 @@ void MainWindow::setDefaultConnectionSettings(int type, const NetSettingsStruct 
     m_settings->setJsonObject(KEY_DEFAULT, defaultSettings);
 }
 
+void MainWindow::onScriptsMenuRequested()
+{
+    if(sender()->inherits("ConnectionWidget"))
+        ui->menuScripts->exec();
+
+    qDebug()<<"MainWindow::onScriptsMenuRequested()";
+
+}
+
 void MainWindow::closeAllTabs()
 {
     int tabsCount = ui->tabWidgetCentral->tabBar()->count();
@@ -123,6 +135,12 @@ void MainWindow::closeAllTabs()
 void MainWindow::saveSession()
 {
     qDebug()<<"MainWindow::saveSession";
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save session"),
+        QDir::currentPath() + "/" + "session.json",
+        "", 0, QFileDialog::DontUseNativeDialog);
+
+    if (fileName.isEmpty()) return;
 
     QJsonObject jSession;
     QJsonArray jSessionTabs;
@@ -154,12 +172,17 @@ void MainWindow::saveSession()
     }
 
     jSession.insert(KEY_CONNECTIONS, jSessionTabs);
-    m_settings->saveJson("session.json", jSession);
+    m_settings->saveJson(fileName, jSession);
 }
 
 void MainWindow::loadSession()
 {
-    QJsonObject jSession = m_settings->loadJson("session.json");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open session"),
+        "", "", 0, QFileDialog::DontUseNativeDialog);
+
+    if (fileName.isEmpty()) return;
+
+    QJsonObject jSession = m_settings->loadJson(fileName);
     if (!jSession.contains(KEY_CONNECTIONS)) return;
 
     closeAllTabs();

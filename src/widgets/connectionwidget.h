@@ -32,6 +32,7 @@ private:
 
 signals:
     void defaultSettings(int type, const NetSettingsStruct &settings);
+    void showScriptMenu();
 
 public slots:
     void setType(int type);

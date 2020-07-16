@@ -11,7 +11,7 @@ function onReadText(text, host, port)
 }
 
 /* Read binary from socket */
-function onReadText(data, host, port)
+function onReadData(data, host, port)
 {
 	console.log('Data (' + host + ':' + port + '): ' + data);
 }

@@ -16,7 +16,7 @@ QFrame[lightFrame="true"]{
 }
 
 QWidget[active="true"]{
-    background: #866;
+    background: #655;
     border: none;
     color: #eee;
 }
@@ -40,7 +40,6 @@ QWidget[border="true"]{
 
 QWidget {
     background: #444;
-    border: none;
     color: #ddd;
 }
 
