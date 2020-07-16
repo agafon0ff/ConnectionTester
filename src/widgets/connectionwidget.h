@@ -45,7 +45,6 @@ public slots:
     NetSettingsStruct settings();
 
     void addScriptItem(const QString &name, const QString &text);
-
     QStringList scriptsNames();
 
     void setStyleString(const QString &styleStr);

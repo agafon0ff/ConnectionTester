@@ -22,7 +22,7 @@ SOURCES += \
     src/network/udpsocket.cpp \
     src/script/scripteditor.cpp \
     src/script/scriptitem.cpp \
-    src/widgets/scriptitemwidget.cpp
+    src/script/scriptitemwidget.cpp
 
 HEADERS += \
     src/global.h \
@@ -35,7 +35,7 @@ HEADERS += \
     src/network/udpsocket.h \
     src/script/scripteditor.h \
     src/script/scriptitem.h \
-    src/widgets/scriptitemwidget.h
+    src/script/scriptitemwidget.h
 
 FORMS += \
     src/widgets/mainwindow.ui \

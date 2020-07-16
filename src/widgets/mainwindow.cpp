@@ -118,11 +118,21 @@ void MainWindow::setDefaultConnectionSettings(int type, const NetSettingsStruct 
 
 void MainWindow::onScriptsMenuRequested()
 {
+    ConnectionWidget *widget = dynamic_cast<ConnectionWidget*>(ui->tabWidgetCentral->currentWidget());
+
+    bool enableActions = widget ? true : false;
+    ui->actionAddScript->setEnabled(enableActions);
+    ui->actionEditScript->setEnabled(enableActions);
+    ui->actionLoadScript->setEnabled(enableActions);
+    ui->actionSaveScript->setEnabled(enableActions);
+    ui->actionRemoveScript->setEnabled(enableActions);
+
     if(sender()->inherits("ConnectionWidget"))
-        ui->menuScripts->exec();
+        ui->menuScripts->exec(QCursor::pos());
+
+
 
     qDebug()<<"MainWindow::onScriptsMenuRequested()";
-
 }
 
 void MainWindow::closeAllTabs()
