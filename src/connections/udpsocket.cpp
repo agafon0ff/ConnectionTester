@@ -31,7 +31,10 @@ void UdpSocket::start()
                          QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint))
     {
         if(settings().useMulticast)
+        {
+            m_udpSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
             m_udpSocket->joinMulticastGroup(QHostAddress(settings().host));
+        }
 
         emit started();
         emit status("OK: UDP-Socket is listening on port: " +

@@ -29,9 +29,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionTcpServer, &QAction::triggered, [=]{addConnection(ConnectionTcpServer);});
     connect(ui->actionTcpSocket, &QAction::triggered, [=]{addConnection(ConnectionTcpSocket);});
     connect(ui->actionUdpSocket, &QAction::triggered, [=]{addConnection(ConnectionUdpSocket);});
-    connect(ui->actionSaveSession, &QAction::triggered, this, &MainWindow::saveSession);
-    connect(ui->actionLoadSession, &QAction::triggered, this, &MainWindow::loadSession);
+    connect(ui->actionSessionSave, &QAction::triggered, this, &MainWindow::saveSession);
+    connect(ui->actionSessionLoad, &QAction::triggered, this, &MainWindow::loadSession);
+
     connect(ui->menuScripts, &QMenu::aboutToShow, this, &MainWindow::onScriptsMenuRequested);
+    connect(ui->actionScriptAdd, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
+    connect(ui->actionScriptEdit, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
+    connect(ui->actionScriptLoad, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
+    connect(ui->actionScriptSave, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
+    connect(ui->actionScriptRemove, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
 
     loadSettings();
 }
@@ -121,22 +127,47 @@ void MainWindow::onScriptsMenuRequested()
     ConnectionWidget *widget = dynamic_cast<ConnectionWidget*>(ui->tabWidgetCentral->currentWidget());
 
     bool enableActions = widget ? true : false;
-    ui->actionAddScript->setEnabled(enableActions);
-    ui->actionEditScript->setEnabled(enableActions);
-    ui->actionLoadScript->setEnabled(enableActions);
-    ui->actionSaveScript->setEnabled(enableActions);
-    ui->actionRemoveScript->setEnabled(enableActions);
+    ui->actionScriptAdd->setEnabled(enableActions);
+    ui->actionScriptLoad->setEnabled(enableActions);
+    ui->actionScriptEdit->setEnabled(enableActions);
+    ui->actionScriptSave->setEnabled(enableActions);
+    ui->actionScriptRemove->setEnabled(enableActions);
 
     if(sender()->inherits("ConnectionWidget"))
         ui->menuScripts->exec(QCursor::pos());
 
+    if (!enableActions) return;
 
+    bool noScript = widget->currentScriptName().isEmpty();
+    ui->actionScriptEdit->setEnabled(!noScript);
+    ui->actionScriptSave->setEnabled(!noScript);
+    ui->actionScriptRemove->setEnabled(!noScript);
+}
 
-    qDebug()<<"MainWindow::onScriptsMenuRequested()";
+void MainWindow::onScriptActionRequested()
+{
+    ConnectionWidget *widget = dynamic_cast<ConnectionWidget*>(ui->tabWidgetCentral->currentWidget());
+    if (!widget) return;
+
+    QAction *action = dynamic_cast<QAction*>(sender());
+    if (!action) return;
+
+    if (action->objectName() == "actionScriptAdd")
+        widget->onScriptAdd();
+    else if (action->objectName() == "actionScriptLoad")
+        widget->onScriptLoad();
+    else if (action->objectName() == "actionScriptEdit")
+        widget->onScriptEdit();
+    else if (action->objectName() == "actionScriptSave")
+        widget->onScriptSave();
+    else if (action->objectName() == "actionScriptRemove")
+        widget->onScriptRemove();
 }
 
 void MainWindow::closeAllTabs()
 {
+    qDebug()<<"MainWindow::closeAllTabs";
+
     int tabsCount = ui->tabWidgetCentral->tabBar()->count();
     for (int i=0; i<tabsCount; ++i)
         onTabCloseRequested(0);
@@ -191,6 +222,8 @@ void MainWindow::loadSession()
         "", "", 0, QFileDialog::DontUseNativeDialog);
 
     if (fileName.isEmpty()) return;
+
+    qDebug()<<"MainWindow::loadSession"<<fileName;
 
     QJsonObject jSession = m_settings->loadJson(fileName);
     if (!jSession.contains(KEY_CONNECTIONS)) return;

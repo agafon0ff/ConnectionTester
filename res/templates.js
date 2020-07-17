@@ -42,3 +42,44 @@ function onScriptStart()
 	var data = new Array(0x68, 0x65, 0x6c, 0x6c, 0x6f);
 	writeData(data, '127.0.0.1', 12345);
 }
+
+/* Timeout */
+var timeoutId = 0;
+
+function printHello()
+{
+    console.log('hello!');
+    scriptStopped();
+}
+
+function onScriptStart()
+{
+    timeoutId = setTimeout(printHello, 1500);
+    scriptStarted();
+}
+
+function onScriptStop()
+{
+    clearTimeout(timeoutId);
+    scriptStopped();
+}
+
+/* Interval */
+var intervalId = 0;
+
+function printHello()
+{
+    console.log('hello!');
+}
+
+function onScriptStart()
+{
+    intervalId = setInterval(printHello, 500);
+    scriptStarted();
+}
+
+function onScriptStop()
+{
+    clearInterval(intervalId);
+    scriptStopped();
+}

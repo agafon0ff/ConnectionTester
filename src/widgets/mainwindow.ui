@@ -70,18 +70,18 @@
     <property name="title">
      <string>Sessions</string>
     </property>
-    <addaction name="actionLoadSession"/>
-    <addaction name="actionSaveSession"/>
+    <addaction name="actionSessionLoad"/>
+    <addaction name="actionSessionSave"/>
    </widget>
    <widget class="QMenu" name="menuScripts">
     <property name="title">
      <string>Scripts</string>
     </property>
-    <addaction name="actionAddScript"/>
-    <addaction name="actionEditScript"/>
-    <addaction name="actionLoadScript"/>
-    <addaction name="actionSaveScript"/>
-    <addaction name="actionRemoveScript"/>
+    <addaction name="actionScriptAdd"/>
+    <addaction name="actionScriptLoad"/>
+    <addaction name="actionScriptSave"/>
+    <addaction name="actionScriptEdit"/>
+    <addaction name="actionScriptRemove"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuNew"/>
@@ -124,7 +124,7 @@
     <string>UDP Socket</string>
    </property>
   </action>
-  <action name="actionLoadSession">
+  <action name="actionSessionLoad">
    <property name="icon">
     <iconset resource="../../res/res.qrc">
      <normaloff>:/icon_folder.png</normaloff>:/icon_folder.png</iconset>
@@ -133,7 +133,7 @@
     <string>Load Session</string>
    </property>
   </action>
-  <action name="actionSaveSession">
+  <action name="actionSessionSave">
    <property name="icon">
     <iconset resource="../../res/res.qrc">
      <normaloff>:/icon_save.png</normaloff>:/icon_save.png</iconset>
@@ -142,7 +142,7 @@
     <string>Save Session</string>
    </property>
   </action>
-  <action name="actionLoadScript">
+  <action name="actionScriptLoad">
    <property name="icon">
     <iconset resource="../../res/res.qrc">
      <normaloff>:/icon_folder.png</normaloff>:/icon_folder.png</iconset>
@@ -151,7 +151,7 @@
     <string>Load Script</string>
    </property>
   </action>
-  <action name="actionSaveScript">
+  <action name="actionScriptSave">
    <property name="icon">
     <iconset resource="../../res/res.qrc">
      <normaloff>:/icon_save.png</normaloff>:/icon_save.png</iconset>
@@ -160,7 +160,7 @@
     <string>Save Script</string>
    </property>
   </action>
-  <action name="actionAddScript">
+  <action name="actionScriptAdd">
    <property name="icon">
     <iconset resource="../../res/res.qrc">
      <normaloff>:/icon_plus.png</normaloff>:/icon_plus.png</iconset>
@@ -169,7 +169,7 @@
     <string>Add Script</string>
    </property>
   </action>
-  <action name="actionEditScript">
+  <action name="actionScriptEdit">
    <property name="icon">
     <iconset resource="../../res/res.qrc">
      <normaloff>:/icon_edit.png</normaloff>:/icon_edit.png</iconset>
@@ -178,7 +178,7 @@
     <string>Edit Script</string>
    </property>
   </action>
-  <action name="actionRemoveScript">
+  <action name="actionScriptRemove">
    <property name="icon">
     <iconset resource="../../res/res.qrc">
      <normaloff>:/icon_cross.png</normaloff>:/icon_cross.png</iconset>

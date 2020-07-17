@@ -7,8 +7,8 @@ CONFIG += c++14
 
 INCLUDEPATH += \
     src \
-    src/network \
-    src/script \
+    src/connections \
+    src/scripts \
     src/widgets
 
 SOURCES += \
@@ -16,31 +16,31 @@ SOURCES += \
     src/jsonsettings.cpp \
     src/widgets/mainwindow.cpp \
     src/widgets/connectionwidget.cpp \
-    src/network/netconnection.cpp \
-    src/network/tcpserver.cpp \
-    src/network/tcpsocket.cpp \
-    src/network/udpsocket.cpp \
-    src/script/scripteditor.cpp \
-    src/script/scriptitem.cpp \
-    src/script/scriptitemwidget.cpp
+    src/connections/netconnection.cpp \
+    src/connections/tcpserver.cpp \
+    src/connections/tcpsocket.cpp \
+    src/connections/udpsocket.cpp \
+    src/scripts/scripteditor.cpp \
+    src/scripts/scriptitem.cpp \
+    src/scripts/scriptitemwidget.cpp
 
 HEADERS += \
     src/global.h \
     src/jsonsettings.h \
     src/widgets/mainwindow.h \
     src/widgets/connectionwidget.h \
-    src/network/netconnection.h \
-    src/network/tcpserver.h \
-    src/network/tcpsocket.h \
-    src/network/udpsocket.h \
-    src/script/scripteditor.h \
-    src/script/scriptitem.h \
-    src/script/scriptitemwidget.h
+    src/connections/netconnection.h \
+    src/connections/tcpserver.h \
+    src/connections/tcpsocket.h \
+    src/connections/udpsocket.h \
+    src/scripts/scripteditor.h \
+    src/scripts/scriptitem.h \
+    src/scripts/scriptitemwidget.h
 
 FORMS += \
     src/widgets/mainwindow.ui \
     src/widgets/connectionwidget.ui \
-    src/script/scripteditor.ui
+    src/scripts/scripteditor.ui
 
 RC_FILE = res/connection.rc
 

@@ -1,6 +1,7 @@
 #ifndef CONNECTIOWIDGET_H
 #define CONNECTIOWIDGET_H
 
+#include <QMenu>
 #include <QWidget>
 #include <QSplitter>
 #include "netconnection.h"
@@ -27,6 +28,7 @@ private:
     int m_type;
     NetConnection *m_netConnection;
     ScriptEditor *m_scriptEditor;
+    QMenu *m_menuScriptEdit;
 
     QString m_styleString;
 
@@ -44,20 +46,24 @@ public slots:
     void setSettings(const NetSettingsStruct &settings);
     NetSettingsStruct settings();
 
+    void onScriptLoad();
+    void onScriptSave();
+    void onScriptAdd();
+    void onScriptEdit();
+    void onScriptRemove();
+
     void addScriptItem(const QString &name, const QString &text);
     QStringList scriptsNames();
+    QString currentScriptName();
 
     void setStyleString(const QString &styleStr);
     void setScriptEditor(ScriptEditor *editor){m_scriptEditor = editor;}
-
 private slots:
     void setStatusMessage(const QString &message, int type);
     void setDatagram(const QByteArray &data, const QString &host, quint16 port);
+    void onScriptContextMenuRequested(const QPoint &pos);
     void onSettingsChanged();
     void onSendClicked();
-    void onAddScriptClicked();
-    void onEditScriptClicked();
-    void onRemoveScriptClicked();
     void onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 };
 

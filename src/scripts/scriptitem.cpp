@@ -1,5 +1,6 @@
 #include "scriptitem.h"
 #include <QDebug>
+#include <QTimerEvent>
 
 QScriptValue onScriptStarted(QScriptContext *context, QScriptEngine *engine)
 {
@@ -23,8 +24,6 @@ QScriptValue onScriptStopped(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue onWriteText(QScriptContext *context, QScriptEngine *engine)
 {
-    Q_UNUSED(context);
-
     if(context->argumentCount() == 0)
         return QScriptValue();
 
@@ -45,8 +44,6 @@ QScriptValue onWriteText(QScriptContext *context, QScriptEngine *engine)
 
 QScriptValue onWriteData(QScriptContext *context, QScriptEngine *engine)
 {
-    Q_UNUSED(context);
-
     if(context->argumentCount() == 0)
         return QScriptValue();
 
@@ -65,6 +62,42 @@ QScriptValue onWriteData(QScriptContext *context, QScriptEngine *engine)
     return QScriptValue();
 }
 
+QScriptValue onSetTimeout(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptItem *script = dynamic_cast<ScriptItem*>(engine->parent());
+    if (!script) return QScriptValue();
+    return script->addTimer(context, false);
+}
+
+QScriptValue onSetInterval(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptItem *script = dynamic_cast<ScriptItem*>(engine->parent());
+    if (!script) return QScriptValue();
+    return script->addTimer(context, true);
+}
+
+QScriptValue onClearTimeout(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptItem *script = dynamic_cast<ScriptItem*>(engine->parent());
+    if (!script) return QScriptValue();
+
+    if(context->argumentCount() > 0)
+        script->removeTimer(context->argument(0).toInt32());
+
+    return QScriptValue();
+}
+
+QScriptValue onClearInterval(QScriptContext *context, QScriptEngine *engine)
+{
+    ScriptItem *script = dynamic_cast<ScriptItem*>(engine->parent());
+    if (!script) return QScriptValue();
+
+    if(context->argumentCount() > 0)
+        script->removeTimer(context->argument(0).toInt32());
+
+    return QScriptValue();
+}
+
 ScriptItem::ScriptItem(QObject *parent) :
     QObject(parent),
     m_engine(new QScriptEngine(this)),
@@ -76,8 +109,30 @@ ScriptItem::ScriptItem(QObject *parent) :
 
 ScriptItem::~ScriptItem()
 {
+    foreach (int key, m_timeoutMap.keys())
+        killTimer(key);
+
+    m_timeoutMap.clear();
+
     delete m_jsConsole;
     delete m_engine;
+}
+
+void ScriptItem::timerEvent(QTimerEvent *e)
+{
+    int id = e->timerId();
+
+    if(m_timeoutMap.contains(id))
+    {
+        TimeoutStruct timeoutStruct = m_timeoutMap.value(id);
+        timeoutStruct.handler.call(QScriptValue(), timeoutStruct.arguments);
+
+        if(timeoutStruct.isTimeout)
+        {
+            m_timeoutMap.remove(id);
+            killTimer(id);
+        }
+    }
 }
 
 void ScriptItem::setName(const QString &name)
@@ -93,16 +148,22 @@ void ScriptItem::setScript(const QString &text)
     m_engine->globalObject().setProperty("console", jsConsoleObj);
 
     QScriptValue funcStarted = m_engine->newFunction(onScriptStarted);
-    m_engine->globalObject().setProperty("scriptStarted", funcStarted);
-
     QScriptValue funcStopped = m_engine->newFunction(onScriptStopped);
-    m_engine->globalObject().setProperty("scriptStopped", funcStopped);
-
     QScriptValue funcWriteText = m_engine->newFunction(onWriteText);
-    m_engine->globalObject().setProperty("writeText", funcWriteText);
-
     QScriptValue funcWriteData = m_engine->newFunction(onWriteData);
+    QScriptValue funcSetTimeout = m_engine->newFunction(onSetTimeout);
+    QScriptValue funcSetInterval = m_engine->newFunction(onSetInterval);
+    QScriptValue funcClearTimeout = m_engine->newFunction(onClearTimeout);
+    QScriptValue funcClearInterval = m_engine->newFunction(onClearInterval);
+
+    m_engine->globalObject().setProperty("scriptStarted", funcStarted);
+    m_engine->globalObject().setProperty("scriptStopped", funcStopped);
+    m_engine->globalObject().setProperty("writeText", funcWriteText);
     m_engine->globalObject().setProperty("writeData", funcWriteData);
+    m_engine->globalObject().setProperty("setTimeout", funcSetTimeout);
+    m_engine->globalObject().setProperty("setInterval", funcSetInterval);
+    m_engine->globalObject().setProperty("clearTimeout", funcClearTimeout);
+    m_engine->globalObject().setProperty("clearInterval", funcClearInterval);
 
     QScriptContext* context = m_engine->pushContext();
     m_engine->evaluate(m_scriptText);
@@ -153,6 +214,31 @@ void ScriptItem::setDatagram(const QByteArray &data, const QString &host, quint1
         args << jsValueFromArray(data, m_engine) << host << static_cast<int>(port);
         m_onReadDataFunc.call(QScriptValue(), args);
     }
+}
+
+int ScriptItem::addTimer(QScriptContext *context, bool loop)
+{
+    if (!context) return 0;
+
+    TimeoutStruct timeoutStruct;
+    timeoutStruct.isTimeout = !loop;
+    timeoutStruct.handler = context->argument(0).toObject();
+    int delay = static_cast<int>(context->argument(1).toInt32());
+
+    for (int i=2; i<context->argumentCount(); ++i)
+        timeoutStruct.arguments.append(context->argument(i));
+
+    int result = startTimer(delay);
+    m_timeoutMap.insert(result, timeoutStruct);
+    return result;
+}
+
+void ScriptItem::removeTimer(int id)
+{
+    if (!m_timeoutMap.contains(id)) return;
+
+    killTimer(id);
+    m_timeoutMap.remove(id);
 }
 
 QByteArray ScriptItem::arrayFromJsValue(const QScriptValue &jsArray)

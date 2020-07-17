@@ -11,6 +11,14 @@
 #include <QScriptValueIterator>
 #include "global.h"
 
+struct TimeoutStruct
+{
+    QScriptValue handler;
+    QScriptValueList arguments;
+    bool isTimeout = true;
+};
+
+class QTimerEvent;
 class JsConsole;
 
 class ScriptItem : public QObject
@@ -34,6 +42,9 @@ private:
     QScriptValue m_onReadTextFunc;
     QScriptValue m_onReadDataFunc;
 
+    QMap<int, TimeoutStruct> m_timeoutMap;
+    void timerEvent(QTimerEvent *e);
+
 signals:
     void started();
     void stopped();
@@ -53,6 +64,8 @@ public slots:
     void stopScript();
 
     void setDatagram(const QByteArray &data, const QString &host, quint16 port);
+    int addTimer(QScriptContext *context, bool loop);
+    void removeTimer(int id);
 
 public:
     static QByteArray arrayFromJsValue(const QScriptValue &jsArray);

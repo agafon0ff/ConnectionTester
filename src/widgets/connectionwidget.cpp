@@ -3,13 +3,17 @@
 #include "scriptitemwidget.h"
 
 #include <QDebug>
+#include <QAction>
+#include <QMessageBox>
+#include <QFileDialog>
 #include <QListWidgetItem>
 
 ConnectionWidget::ConnectionWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ConnectionWidget),
     m_netConnection(Q_NULLPTR),
-    m_scriptEditor(Q_NULLPTR)
+    m_scriptEditor(Q_NULLPTR),
+    m_menuScriptEdit(new QMenu(this))
 {
     ui->setupUi(this);
 
@@ -21,6 +25,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     ui->lineEditUdpSocketPort->setValidator(new QIntValidator(10, 999999, this));
     ui->lineEditUdpSocketPortDst->setValidator(new QIntValidator(10, 999999, this));
 
+    connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clearHistory);
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clear);
     connect(ui->btnClearOutput, &QPushButton::clicked, ui->textEditOutput, &QTextEdit::clear);
     connect(ui->btnSend, &QPushButton::clicked, this, &ConnectionWidget::onSendClicked);
@@ -43,6 +48,10 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(ui->splitterH, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->splitterV, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->listWidgetScripts, &QListWidget::currentItemChanged, this, &ConnectionWidget::onCurrentItemChanged);
+
+    m_menuScriptEdit->addAction(QIcon(":/icon_edit.png"),tr("Edit Script"),this, &ConnectionWidget::onScriptEdit);
+    m_menuScriptEdit->addAction(QIcon(":/icon_save.png"),tr("Save Script"),this, &ConnectionWidget::onScriptSave);
+    m_menuScriptEdit->addAction(QIcon(":/icon_cross.png"),tr("Remove Script"),this, &ConnectionWidget::onScriptRemove);
 
     qDebug()<<"*ConnectionWidget";
 }
@@ -135,14 +144,159 @@ NetSettingsStruct ConnectionWidget::settings()
     return netSettings;
 }
 
+void ConnectionWidget::onScriptLoad()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open script"),
+        QDir::currentPath(),
+        "", 0, QFileDialog::DontUseNativeDialog);
+
+    if (fileName.isEmpty()) return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) return;
+
+    QString scriptText = QString::fromUtf8(file.readAll());
+    file.close();
+
+    int step = 0;
+
+    for (step; step<scriptText.size(); ++step)
+        if(scriptText.at(step) == "\n")
+            break;
+
+    QString scriptName = scriptText.mid(0, step);
+    if (scriptName.contains("/* ") && scriptName.contains(" */"))
+    {
+        if(scriptText.size() > step + 1)
+            scriptText.remove(0, step + 1);
+
+        scriptName.remove("/* ");
+        scriptName.remove(" */");
+    }
+    else
+    {
+        QFileInfo fInfo(fileName);
+        scriptName = fInfo.fileName();
+        scriptName.remove(".js");
+    }
+
+    if (!scriptName.isEmpty() && !scriptText.isEmpty())
+        addScriptItem(scriptName, scriptText);
+}
+
+void ConnectionWidget::onScriptSave()
+{
+    qDebug()<<"ConnectionWidget::onScriptSave";
+
+    QListWidgetItem *listItem = ui->listWidgetScripts->currentItem();
+    ScriptItemWidget *itemWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(listItem));
+
+    if(!itemWidget || !listItem) return;
+
+    QString scriptName = itemWidget->name();
+    QString scriptText = m_netConnection->scriptText(scriptName);
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save script"),
+        QDir::currentPath() + "/" + "script_" + scriptName + ".js",
+        "", 0, QFileDialog::DontUseNativeDialog);
+
+    if (fileName.isEmpty()) return;
+
+    scriptText.prepend("/* " + scriptName + " */\n");
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) return;
+
+    file.write(scriptText.toUtf8());
+    file.close();
+}
+
+void ConnectionWidget::onScriptAdd()
+{
+    if (!m_scriptEditor) return;
+
+    m_scriptEditor->clear();
+    if (m_scriptEditor->exec() != QDialog::Accepted)
+        return;
+
+    QString scriptText = m_scriptEditor->scriptText();
+    QString scriptName = m_scriptEditor->scriptName();
+
+    if (scriptName.isEmpty()) return;
+    addScriptItem(scriptName, scriptText);
+}
+
+void ConnectionWidget::onScriptEdit()
+{
+    if (!m_scriptEditor) return;
+
+    QListWidgetItem *listItem = ui->listWidgetScripts->currentItem();
+    ScriptItemWidget *itemWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(listItem));
+
+    if(!itemWidget || !listItem) return;
+
+    QString scriptName = itemWidget->name();
+    QString scriptText = m_netConnection->scriptText(scriptName);
+
+    m_scriptEditor->setScriptName(scriptName);
+    m_scriptEditor->setScriptText(scriptText);
+
+    if (m_scriptEditor->exec() != QDialog::Accepted) return;
+    if(m_scriptEditor->scriptName().isEmpty()) return;
+
+    m_netConnection->removeScript(scriptName);
+    scriptName = m_scriptEditor->scriptName();
+    scriptText = m_scriptEditor->scriptText();
+
+    itemWidget->setName(scriptName);
+    listItem->setText(scriptName);
+
+    ScriptItem *script = m_netConnection->addScript(scriptName, scriptText);
+    connect(itemWidget, &ScriptItemWidget::startClicked, script, &ScriptItem::startScript);
+    connect(itemWidget, &ScriptItemWidget::stopClicked, script, &ScriptItem::stopScript);
+    connect(script, &ScriptItem::started, itemWidget, &ScriptItemWidget::onStarted);
+    connect(script, &ScriptItem::stopped, itemWidget, &ScriptItemWidget::onStopped);
+}
+
+void ConnectionWidget::onScriptRemove()
+{
+    QListWidgetItem *currItem = ui->listWidgetScripts->currentItem();
+    ScriptItemWidget *itemWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(currItem));
+
+    if(!currItem || !itemWidget)
+        return;
+
+    QMessageBox *msgBox = new QMessageBox(this);
+    msgBox->setWindowTitle(tr("Delete script"));
+    msgBox->setText(tr("Confirm script deletion:") + "      \n\"" + itemWidget->name() + "\"");
+    msgBox->setIconPixmap(QPixmap(":/icon_cross.png"));
+    QPushButton *okButton = msgBox->addButton(tr("OK"), QMessageBox::AcceptRole);
+    QPushButton *cancelButton = msgBox->addButton(tr("Cancel"), QMessageBox::RejectRole);
+
+    okButton->setIcon(QIcon(":/icon_ok.png"));
+    cancelButton->setIcon(QIcon(":/icon_cross.png"));
+
+    if(msgBox->exec() == QMessageBox::AcceptRole)
+    {
+        m_netConnection->removeScript(itemWidget->name());
+        ui->listWidgetScripts->removeItemWidget(currItem);
+        itemWidget->disconnect();
+        delete itemWidget;
+        delete currItem;
+    }
+
+    delete msgBox;
+}
+
 void ConnectionWidget::addScriptItem(const QString &name, const QString &text)
 {
-    ScriptItem *script = m_netConnection->addScript(name, text);
-
     ScriptItemWidget *itemWidget = new ScriptItemWidget(this);
     itemWidget->setName(name);
     itemWidget->setStyleSheet(m_styleString);
     itemWidget->initWidget();
+    itemWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(itemWidget, &ScriptItemWidget::customContextMenuRequested,
+            this, &ConnectionWidget::onScriptContextMenuRequested);
 
     QListWidgetItem *listItem = new QListWidgetItem(name);
     listItem->setSizeHint(itemWidget->sizeHint());
@@ -151,6 +305,7 @@ void ConnectionWidget::addScriptItem(const QString &name, const QString &text)
     ui->listWidgetScripts->addItem(listItem);
     ui->listWidgetScripts->setItemWidget(listItem, itemWidget);
 
+    ScriptItem *script = m_netConnection->addScript(name, text);
     connect(itemWidget, &ScriptItemWidget::startClicked, script, &ScriptItem::startScript);
     connect(itemWidget, &ScriptItemWidget::stopClicked, script, &ScriptItem::stopScript);
     connect(script, &ScriptItem::started, itemWidget, &ScriptItemWidget::onStarted);
@@ -169,6 +324,16 @@ QStringList ConnectionWidget::scriptsNames()
 
         result.append(itemWidget->name());
     }
+
+    return result;
+}
+
+QString ConnectionWidget::currentScriptName()
+{
+    QString result;
+
+    QListWidgetItem *item = ui->listWidgetScripts->currentItem();
+    if (item) result = item->text();
 
     return result;
 }
@@ -217,6 +382,11 @@ void ConnectionWidget::setDatagram(const QByteArray &data, const QString &host, 
         ui->textBrowserInput->append("");
 }
 
+void ConnectionWidget::onScriptContextMenuRequested(const QPoint &pos)
+{
+    m_menuScriptEdit->exec(QCursor::pos());
+}
+
 void ConnectionWidget::onSettingsChanged()
 {
     if (!m_netConnection) return;
@@ -262,68 +432,6 @@ void ConnectionWidget::onSendClicked()
     m_netConnection->sendDatagram(text.toUtf8(), host, port);
 
     setStatusMessage("← " + text, StatusOutput);
-}
-
-void ConnectionWidget::onAddScriptClicked()
-{
-    if (!m_scriptEditor) return;
-
-    m_scriptEditor->clear();
-    if (m_scriptEditor->exec() != QDialog::Accepted)
-        return;
-
-    QString scriptText = m_scriptEditor->scriptText();
-    QString scriptName = m_scriptEditor->scriptName();
-
-    if (scriptName.isEmpty()) return;
-    addScriptItem(scriptName, scriptText);
-}
-
-void ConnectionWidget::onEditScriptClicked()
-{
-    if (!m_scriptEditor) return;
-
-    QListWidgetItem *currItem = ui->listWidgetScripts->currentItem();
-    ScriptItemWidget *itemWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(currItem));
-
-    if(!itemWidget || !currItem) return;
-
-    QString scriptName = itemWidget->name();
-    QString scriptText = m_netConnection->scriptText(scriptName);
-
-    m_scriptEditor->setScriptName(scriptName);
-    m_scriptEditor->setScriptText(scriptText);
-
-    if (m_scriptEditor->exec() != QDialog::Accepted) return;
-    if(m_scriptEditor->scriptName().isEmpty()) return;
-
-    m_netConnection->removeScript(scriptName);
-    scriptName = m_scriptEditor->scriptName();
-    scriptText = m_scriptEditor->scriptText();
-
-    ScriptItem *script = m_netConnection->addScript(scriptName, scriptText);
-    itemWidget->setName(scriptName);
-    currItem->setText(scriptName);
-
-    connect(itemWidget, &ScriptItemWidget::startClicked, script, &ScriptItem::startScript);
-    connect(itemWidget, &ScriptItemWidget::stopClicked, script, &ScriptItem::stopScript);
-    connect(script, &ScriptItem::started, itemWidget, &ScriptItemWidget::onStarted);
-    connect(script, &ScriptItem::stopped, itemWidget, &ScriptItemWidget::onStopped);
-}
-
-void ConnectionWidget::onRemoveScriptClicked()
-{
-    QListWidgetItem *currItem = ui->listWidgetScripts->currentItem();
-    ScriptItemWidget *itemWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(currItem));
-
-    if(!currItem || !itemWidget)
-        return;
-
-    m_netConnection->removeScript(itemWidget->name());
-    ui->listWidgetScripts->removeItemWidget(currItem);
-    itemWidget->disconnect();
-    delete itemWidget;
-    delete currItem;
 }
 
 void ConnectionWidget::onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)

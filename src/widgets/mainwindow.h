@@ -34,6 +34,7 @@ private slots:
 
     void setDefaultConnectionSettings(int type, const NetSettingsStruct &settings);
     void onScriptsMenuRequested();
+    void onScriptActionRequested();
 
     void closeAllTabs();
 
