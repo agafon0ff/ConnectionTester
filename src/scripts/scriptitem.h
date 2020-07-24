@@ -10,6 +10,7 @@
 #include <QScriptValue>
 #include <QScriptValueIterator>
 #include "global.h"
+#include "scriptobjects.h"
 
 struct TimeoutStruct
 {
@@ -36,6 +37,7 @@ private:
     QString m_scriptText;
 
     JsConsole *m_jsConsole;
+    JsJSON *m_jsJson;
 
     QScriptValue m_onScriptStartFunc;
     QScriptValue m_onScriptStopFunc;
@@ -70,15 +72,6 @@ public slots:
 public:
     static QByteArray arrayFromJsValue(const QScriptValue &jsArray);
     static QScriptValue jsValueFromArray(const QByteArray &ba, QScriptEngine *jsEngine);
-};
-
-class JsConsole : public QObject
-{
-    Q_OBJECT
-signals:
-    void logMessage(const QString &text);
-public slots:
-    void log(const QString &text){emit logMessage(text);}
 };
 
 #endif // SCRIPTITEM_H

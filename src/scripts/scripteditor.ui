@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>526</height>
+    <width>749</width>
+    <height>555</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
     <number>5</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,1,0,1">
      <item>
       <widget class="QLabel" name="labelScriptName">
        <property name="text">

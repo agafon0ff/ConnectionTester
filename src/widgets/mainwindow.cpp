@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_scriptEditor(new ScriptEditor)
 {
     ui->setupUi(this);
-    m_scriptEditor->hide();
+    m_scriptEditor->show();
 
     loadFont();
     loadStyleSheet();

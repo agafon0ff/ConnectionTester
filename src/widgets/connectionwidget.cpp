@@ -25,6 +25,15 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     ui->lineEditUdpSocketPort->setValidator(new QIntValidator(10, 999999, this));
     ui->lineEditUdpSocketPortDst->setValidator(new QIntValidator(10, 999999, this));
 
+    QFont font;
+    font.setFamily("Courier");
+    font.setStyleHint(QFont::Monospace);
+    font.setFixedPitch(true);
+    font.setPointSize(10);
+    QFontMetrics metrics(font);
+    ui->textEditOutput->setFont(font);
+    ui->textEditOutput->setTabStopWidth(4 * metrics.width(' '));
+
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clearHistory);
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clear);
     connect(ui->btnClearOutput, &QPushButton::clicked, ui->textEditOutput, &QTextEdit::clear);

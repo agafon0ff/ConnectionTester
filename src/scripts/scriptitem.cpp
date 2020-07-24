@@ -101,7 +101,8 @@ QScriptValue onClearInterval(QScriptContext *context, QScriptEngine *engine)
 ScriptItem::ScriptItem(QObject *parent) :
     QObject(parent),
     m_engine(new QScriptEngine(this)),
-    m_jsConsole(new JsConsole)
+    m_jsConsole(new JsConsole),
+    m_jsJson(new JsJSON(m_engine))
 {
     connect(m_jsConsole, &JsConsole::logMessage,
             [=](const QString &text){emit status(text, StatusConsole);});
@@ -114,6 +115,7 @@ ScriptItem::~ScriptItem()
 
     m_timeoutMap.clear();
 
+    delete m_jsJson;
     delete m_jsConsole;
     delete m_engine;
 }
@@ -146,6 +148,9 @@ void ScriptItem::setScript(const QString &text)
 
     QScriptValue jsConsoleObj =  m_engine->newQObject(m_jsConsole);
     m_engine->globalObject().setProperty("console", jsConsoleObj);
+
+    QScriptValue jsJsonObj =  m_engine->newQObject(m_jsJson);
+    m_engine->globalObject().setProperty("JSON", jsJsonObj);
 
     QScriptValue funcStarted = m_engine->newFunction(onScriptStarted);
     QScriptValue funcStopped = m_engine->newFunction(onScriptStopped);
