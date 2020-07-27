@@ -30,7 +30,7 @@
     <number>5</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,1,0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,1,0">
      <item>
       <widget class="QLabel" name="labelScriptName">
        <property name="text">
@@ -55,14 +55,11 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="labelPasteTemplate">
+      <widget class="QPushButton" name="btnTemplates">
        <property name="text">
-        <string>Paste template:</string>
+        <string>Ttemplates</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboBoxScriptTemplates"/>
      </item>
     </layout>
    </item>

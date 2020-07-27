@@ -31,6 +31,8 @@ private:
     QMenu *m_menuScriptEdit;
 
     QString m_styleString;
+    QString m_scriptsDir;
+    bool m_isConnectionChanged;
 
 signals:
     void defaultSettings(int type, const NetSettingsStruct &settings);
@@ -46,10 +48,14 @@ public slots:
     void setSettings(const NetSettingsStruct &settings);
     NetSettingsStruct settings();
 
+    bool isChanged();
+    void applyChanges();
+
     void onScriptLoad();
     void onScriptSave();
     void onScriptAdd();
     void onScriptEdit();
+    void onScriptDuplicate();
     void onScriptRemove();
 
     void addScriptItem(const QString &name, const QString &text);

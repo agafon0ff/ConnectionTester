@@ -23,6 +23,11 @@ const QString KEY_SCRIPTS =     "scripts";
 const QString KEY_TEXT =        "text";
 const QString KEY_SPLITTER_H =  "splitterH";
 const QString KEY_SPLITTER_V =  "splitterV";
+const QString KEY_SESSIONS_DIR =  "sessionsDir";
+const QString KEY_SCRIPTS_DIR =  "scriptsDir";
+const QString KEY_GEOMETRY_MAIN =  "geometryMain";
+const QString KEY_GEOMETRY_EDITOR =  "geometryEditor";
+const QString KEY_RECENT_SESSIONS =  "recentSessions";
 
 const QString KEY_CONNECTION_TYPE = "connectionType";
 const QString KEY_TCP_SERVER =      "tcpServer";
@@ -47,7 +52,8 @@ enum StatusType
     StatusConsole = 0,
     StatusOk,
     StatusError,
-    StatusOutput
+    StatusOutput,
+    StatusInput
 };
 
 struct TwoNumbers
@@ -75,6 +81,7 @@ struct NetSettingsStruct
     bool showText = true;
     bool addNewLine = false;
 
+    QString scriptsDir;
     TwoNumbers splitterH;
     TwoNumbers splitterV;
 

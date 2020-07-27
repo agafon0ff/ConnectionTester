@@ -1,10 +1,10 @@
 #ifndef SCRIPTEDITOR_H
 #define SCRIPTEDITOR_H
 
+#include <QMenu>
 #include <QDialog>
-#include <QSyntaxHighlighter>
-#include <QHash>
 #include <QTextCharFormat>
+#include <QSyntaxHighlighter>
 
 namespace Ui {
 class ScriptEditor;
@@ -29,13 +29,14 @@ public:
 private:
     Ui::ScriptEditor *ui;
     Highlighter* m_highlighter;
+    QMenu *m_menuTemplates;
     QString m_scriptName;
     QString m_scriptText;
     QMap<QString, QString> m_templatesMap;
 
 private slots:
     void onBtnOkClicked();
-    void onComboTemplatesActivated(const QString &key);
+    void onBtnTemplatesClicked();
     void readTemplatesFile();
 };
 

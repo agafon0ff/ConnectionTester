@@ -7,9 +7,11 @@
 #include <QFontDatabase>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QPushButton>
 #include <QDebug>
 #include <QFile>
-#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_scriptEditor(new ScriptEditor)
 {
     ui->setupUi(this);
-    m_scriptEditor->show();
+    m_scriptEditor->hide();
 
     loadFont();
     loadStyleSheet();
@@ -31,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionUdpSocket, &QAction::triggered, [=]{addConnection(ConnectionUdpSocket);});
     connect(ui->actionSessionSave, &QAction::triggered, this, &MainWindow::saveSession);
     connect(ui->actionSessionLoad, &QAction::triggered, this, &MainWindow::loadSession);
+    connect(ui->menuRecentSessions, &QMenu::triggered, this, &MainWindow::onRecentSessionTriggered);
 
     connect(ui->menuScripts, &QMenu::aboutToShow, this, &MainWindow::onScriptsMenuRequested);
     connect(ui->actionScriptAdd, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
@@ -51,7 +54,12 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     e->ignore();
+
+    if (!checkSessionChanges()) return;
+
+    closeAllTabs();
     saveSettings();
+
     e->accept();
 }
 
@@ -103,6 +111,14 @@ void MainWindow::onTabCloseRequested(int index)
 {
     qDebug()<<"MainWindow::onTabCloseRequested"<<index;
 
+    if (!checkSessionChanges()) return;
+    closeConnectionTab(index);
+}
+
+void MainWindow::closeConnectionTab(int index)
+{
+    qDebug()<<"MainWindow::closeConnectionTab"<<index;
+
     ConnectionWidget *widget = dynamic_cast<ConnectionWidget*>(ui->tabWidgetCentral->widget(index));
     NetConnection *netConnection = widget->netConnection();
 
@@ -131,6 +147,7 @@ void MainWindow::onScriptsMenuRequested()
     ui->actionScriptLoad->setEnabled(enableActions);
     ui->actionScriptEdit->setEnabled(enableActions);
     ui->actionScriptSave->setEnabled(enableActions);
+    ui->actionDublicateScript->setEnabled(enableActions);
     ui->actionScriptRemove->setEnabled(enableActions);
 
     if(sender()->inherits("ConnectionWidget"))
@@ -141,6 +158,7 @@ void MainWindow::onScriptsMenuRequested()
     bool noScript = widget->currentScriptName().isEmpty();
     ui->actionScriptEdit->setEnabled(!noScript);
     ui->actionScriptSave->setEnabled(!noScript);
+    ui->actionDublicateScript->setEnabled(!noScript);
     ui->actionScriptRemove->setEnabled(!noScript);
 }
 
@@ -160,6 +178,8 @@ void MainWindow::onScriptActionRequested()
         widget->onScriptEdit();
     else if (action->objectName() == "actionScriptSave")
         widget->onScriptSave();
+    else if (action->objectName() == "actionDublicateScript")
+        widget->onScriptDuplicate();
     else if (action->objectName() == "actionScriptRemove")
         widget->onScriptRemove();
 }
@@ -170,18 +190,71 @@ void MainWindow::closeAllTabs()
 
     int tabsCount = ui->tabWidgetCentral->tabBar()->count();
     for (int i=0; i<tabsCount; ++i)
-        onTabCloseRequested(0);
+        closeConnectionTab(0);
 }
 
-void MainWindow::saveSession()
+bool MainWindow::checkSessionChanges()
+{
+    qDebug()<<"MainWindow::checkSessionChanges";
+    bool result = true;
+    bool isConnectionsChanged = false;
+    int tabsCount = ui->tabWidgetCentral->tabBar()->count();
+    for (int i=0; i<tabsCount; ++i)
+    {
+        ConnectionWidget *widget = dynamic_cast<ConnectionWidget*>(ui->tabWidgetCentral->widget(i));
+
+        if (widget->isChanged())
+        {
+            isConnectionsChanged = true;
+            break;
+        }
+    }
+
+    if(isConnectionsChanged)
+    {
+        QMessageBox *msgBox = new QMessageBox(this);
+        msgBox->setWindowTitle(tr("Session has been modified"));
+        msgBox->setText(tr("Do you want to save session?"));
+        msgBox->setIcon(QMessageBox::Question);
+
+        QPushButton *saveButton = msgBox->addButton(tr("Save"), QMessageBox::YesRole);
+        QPushButton *cancelButton = msgBox->addButton(tr("Cancel"), QMessageBox::RejectRole);
+        QPushButton *discardButton = msgBox->addButton(tr("Don't save"), QMessageBox::NoRole);
+
+        saveButton->setIcon(QIcon(":/icon_ok.png"));
+        cancelButton->setIcon(QIcon(":/icon_left.png"));
+        discardButton->setIcon(QIcon(":/icon_cross.png"));
+        discardButton->setMinimumWidth(100);
+
+        msgBox->exec();
+
+        if(msgBox->clickedButton() == saveButton)
+        {
+            result = saveSession();
+        }
+        else if(msgBox->clickedButton() == discardButton)
+        {
+            result = true;
+        }
+        else result = false;
+
+        delete msgBox;
+    }
+
+    return result;
+}
+
+bool MainWindow::saveSession()
 {
     qDebug()<<"MainWindow::saveSession";
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save session"),
-        QDir::currentPath() + "/" + "session.json",
-        "", 0, QFileDialog::DontUseNativeDialog);
+        m_sessionsDir + "/" + "session.ctses",
+        "*.ctses", 0, QFileDialog::DontUseNativeDialog);
 
-    if (fileName.isEmpty()) return;
+    if (fileName.isEmpty()) return false;
+
+    updateRecentSessions(fileName);
 
     QJsonObject jSession;
     QJsonArray jSessionTabs;
@@ -210,22 +283,32 @@ void MainWindow::saveSession()
 
         jConnection.insert(KEY_SCRIPTS, jScriptsList);
         jSessionTabs.append(jConnection);
+        widget->applyChanges();
     }
 
     jSession.insert(KEY_CONNECTIONS, jSessionTabs);
     m_settings->saveJson(fileName, jSession);
+    return true;
 }
 
 void MainWindow::loadSession()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open session"),
-        "", "", 0, QFileDialog::DontUseNativeDialog);
+        m_sessionsDir, "*.ctses", 0, QFileDialog::DontUseNativeDialog);
 
     if (fileName.isEmpty()) return;
 
     qDebug()<<"MainWindow::loadSession"<<fileName;
 
-    QJsonObject jSession = m_settings->loadJson(fileName);
+    openSession(fileName);
+}
+
+void MainWindow::openSession(const QString &path)
+{
+    if (!checkSessionChanges()) return;
+    updateRecentSessions(path);
+
+    QJsonObject jSession = m_settings->loadJson(path);
     if (!jSession.contains(KEY_CONNECTIONS)) return;
 
     closeAllTabs();
@@ -247,17 +330,64 @@ void MainWindow::loadSession()
             QString text = jScript.value(KEY_TEXT).toString();
             widget->addScriptItem(name, text);
         }
+
+        widget->applyChanges();
     }
+}
+
+void MainWindow::updateRecentSessions(const QString &path)
+{
+    qDebug()<<"MainWindow::updateRecentSessions" << path;
+
+    if(!path.isEmpty())
+    {
+        QFileInfo fInfo(path);
+        m_sessionsDir = fInfo.dir().path();
+
+        if (m_recentSessions.contains(path))
+            m_recentSessions.removeOne(path);
+
+        m_recentSessions.prepend(path);
+
+        if(m_recentSessions.size() > 10)
+            m_recentSessions.removeLast();
+    }
+
+    foreach (QAction *action, m_recentSessionActions)
+        ui->menuRecentSessions->removeAction(action);
+
+    m_recentSessionActions.clear();
+
+    foreach (const QString &session, m_recentSessions)
+        m_recentSessionActions.append(ui->menuRecentSessions->addAction(session));
+}
+
+void MainWindow::onRecentSessionTriggered(QAction *action)
+{
+    if (!action) return;
+
+    qDebug()<<"MainWindow::onRecentSessionTriggered" << action->text();
+
+    openSession(action->text());
 }
 
 void MainWindow::saveSettings()
 {
-    m_settings->setParameter("geometryMain",QString::fromLocal8Bit(saveGeometry().toBase64()));
+    QMap<QString, QVariant> parameters;
+    parameters.insert(KEY_GEOMETRY_MAIN, QString::fromLocal8Bit(saveGeometry().toBase64()));
+    parameters.insert(KEY_GEOMETRY_EDITOR, QString::fromLocal8Bit(m_scriptEditor->saveGeometry().toBase64()));
+    parameters.insert(KEY_SESSIONS_DIR, m_sessionsDir);
+    parameters.insert(KEY_RECENT_SESSIONS, m_recentSessions);
+    m_settings->setParameters(parameters);
 }
 
 void MainWindow::loadSettings()
 {
-    restoreGeometry(QByteArray::fromBase64(m_settings->getParameter("geometryMain").toString().toLocal8Bit()));
+    restoreGeometry(QByteArray::fromBase64(m_settings->getParameter(KEY_GEOMETRY_MAIN).toString().toLocal8Bit()));
+    m_scriptEditor->restoreGeometry(QByteArray::fromBase64(m_settings->getParameter(KEY_GEOMETRY_EDITOR).toString().toLocal8Bit()));
+    m_sessionsDir = m_settings->getParameter(KEY_SESSIONS_DIR).toString();
+    m_recentSessions = m_settings->getParameter(KEY_RECENT_SESSIONS).toStringList();
+    updateRecentSessions();
 }
 
 void MainWindow::loadFont()

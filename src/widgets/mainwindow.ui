@@ -70,8 +70,18 @@
     <property name="title">
      <string>Sessions</string>
     </property>
+    <widget class="QMenu" name="menuRecentSessions">
+     <property name="title">
+      <string>Recent Sessions</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../res/res.qrc">
+       <normaloff>:/icon_clock.png</normaloff>:/icon_clock.png</iconset>
+     </property>
+    </widget>
     <addaction name="actionSessionLoad"/>
     <addaction name="actionSessionSave"/>
+    <addaction name="menuRecentSessions"/>
    </widget>
    <widget class="QMenu" name="menuScripts">
     <property name="title">
@@ -81,6 +91,7 @@
     <addaction name="actionScriptLoad"/>
     <addaction name="actionScriptSave"/>
     <addaction name="actionScriptEdit"/>
+    <addaction name="actionDublicateScript"/>
     <addaction name="actionScriptRemove"/>
    </widget>
    <addaction name="menuFile"/>
@@ -185,6 +196,20 @@
    </property>
    <property name="text">
     <string>Remove Script</string>
+   </property>
+  </action>
+  <action name="actionDublicateScript">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_copy.png</normaloff>:/icon_copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Duplicate Script</string>
+   </property>
+  </action>
+  <action name="actionEmpty">
+   <property name="text">
+    <string>Empty</string>
    </property>
   </action>
  </widget>

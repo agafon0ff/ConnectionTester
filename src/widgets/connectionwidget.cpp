@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QAction>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QListWidgetItem>
@@ -13,7 +14,8 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     ui(new Ui::ConnectionWidget),
     m_netConnection(Q_NULLPTR),
     m_scriptEditor(Q_NULLPTR),
-    m_menuScriptEdit(new QMenu(this))
+    m_menuScriptEdit(new QMenu(this)),
+    m_isConnectionChanged(true)
 {
     ui->setupUi(this);
 
@@ -33,6 +35,8 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     QFontMetrics metrics(font);
     ui->textEditOutput->setFont(font);
     ui->textEditOutput->setTabStopWidth(4 * metrics.width(' '));
+    ui->textBrowserInput->setFont(font);
+    ui->textBrowserInput->setTabStopWidth(4 * metrics.width(' '));
 
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clearHistory);
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clear);
@@ -60,6 +64,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
 
     m_menuScriptEdit->addAction(QIcon(":/icon_edit.png"),tr("Edit Script"),this, &ConnectionWidget::onScriptEdit);
     m_menuScriptEdit->addAction(QIcon(":/icon_save.png"),tr("Save Script"),this, &ConnectionWidget::onScriptSave);
+    m_menuScriptEdit->addAction(QIcon(":/icon_copy.png"),tr("Duplicate Script"),this, &ConnectionWidget::onScriptDuplicate);
     m_menuScriptEdit->addAction(QIcon(":/icon_cross.png"),tr("Remove Script"),this, &ConnectionWidget::onScriptRemove);
 
     qDebug()<<"*ConnectionWidget";
@@ -138,6 +143,7 @@ void ConnectionWidget::setSettings(const NetSettingsStruct &settings)
     if (ui->checkBoxAutoStart->isChecked())
         m_netConnection->start();
 
+    m_scriptsDir = settings.scriptsDir;
     ui->splitterH->setSizes(QList<int>() << settings.splitterH.first << settings.splitterH.second);
     ui->splitterV->setSizes(QList<int>() << settings.splitterV.first << settings.splitterV.second);
 }
@@ -153,13 +159,29 @@ NetSettingsStruct ConnectionWidget::settings()
     return netSettings;
 }
 
+bool ConnectionWidget::isChanged()
+{
+    return m_isConnectionChanged;
+}
+
+void ConnectionWidget::applyChanges()
+{
+    m_isConnectionChanged = false;
+}
+
 void ConnectionWidget::onScriptLoad()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open script"),
-        QDir::currentPath(),
-        "", 0, QFileDialog::DontUseNativeDialog);
+        m_scriptsDir, "*.js", 0, QFileDialog::DontUseNativeDialog);
 
     if (fileName.isEmpty()) return;
+
+    QFileInfo fInfo(fileName);
+    if(m_scriptsDir != fInfo.dir().path())
+    {
+        m_scriptsDir = fInfo.dir().path();
+        onSettingsChanged();
+    }
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) return;
@@ -206,10 +228,17 @@ void ConnectionWidget::onScriptSave()
     QString scriptText = m_netConnection->scriptText(scriptName);
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save script"),
-        QDir::currentPath() + "/" + "script_" + scriptName + ".js",
-        "", 0, QFileDialog::DontUseNativeDialog);
+        m_scriptsDir + "/" + "script_" + scriptName + ".js",
+        "*.js", 0, QFileDialog::DontUseNativeDialog);
 
     if (fileName.isEmpty()) return;
+
+    QFileInfo fInfo(fileName);
+    if(m_scriptsDir != fInfo.dir().path())
+    {
+        m_scriptsDir = fInfo.dir().path();
+        onSettingsChanged();
+    }
 
     scriptText.prepend("/* " + scriptName + " */\n");
 
@@ -265,6 +294,22 @@ void ConnectionWidget::onScriptEdit()
     connect(itemWidget, &ScriptItemWidget::stopClicked, script, &ScriptItem::stopScript);
     connect(script, &ScriptItem::started, itemWidget, &ScriptItemWidget::onStarted);
     connect(script, &ScriptItem::stopped, itemWidget, &ScriptItemWidget::onStopped);
+
+    m_isConnectionChanged = true;
+}
+
+void ConnectionWidget::onScriptDuplicate()
+{
+    QListWidgetItem *listItem = ui->listWidgetScripts->currentItem();
+    ScriptItemWidget *itemWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(listItem));
+
+    if(!itemWidget || !listItem) return;
+
+    QString scriptName = itemWidget->name();
+    QString scriptText = m_netConnection->scriptText(scriptName);
+
+    if (scriptName.isEmpty()) return;
+    addScriptItem(scriptName + '_', scriptText);
 }
 
 void ConnectionWidget::onScriptRemove()
@@ -292,9 +337,12 @@ void ConnectionWidget::onScriptRemove()
         itemWidget->disconnect();
         delete itemWidget;
         delete currItem;
+        m_isConnectionChanged = true;
+
     }
 
     delete msgBox;
+
 }
 
 void ConnectionWidget::addScriptItem(const QString &name, const QString &text)
@@ -319,6 +367,8 @@ void ConnectionWidget::addScriptItem(const QString &name, const QString &text)
     connect(itemWidget, &ScriptItemWidget::stopClicked, script, &ScriptItem::stopScript);
     connect(script, &ScriptItem::started, itemWidget, &ScriptItemWidget::onStarted);
     connect(script, &ScriptItem::stopped, itemWidget, &ScriptItemWidget::onStopped);
+
+    m_isConnectionChanged = true;
 }
 
 QStringList ConnectionWidget::scriptsNames()
@@ -356,7 +406,7 @@ void ConnectionWidget::setStyleString(const QString &styleStr)
 
 void ConnectionWidget::setStatusMessage(const QString &message, int type)
 {
-    QString color = "#ddd";
+    QString color = "#eee";
 
     if (type == StatusOk)
         color = "#5BC791";
@@ -375,7 +425,7 @@ void ConnectionWidget::setDatagram(const QByteArray &data, const QString &host, 
     QString id = host + ":" + QString::number(port);
 
     if(ui->checkBoxShowText->isChecked())
-        ui->textBrowserInput->append(id + "→ " + QString::fromUtf8(data));
+        setStatusMessage(id + ": " + QString::fromUtf8(data), StatusInput);
 
     if(ui->checkBoxShowHex->isChecked())
     {
@@ -384,7 +434,8 @@ void ConnectionWidget::setDatagram(const QByteArray &data, const QString &host, 
             inputHex.append(QString("|%1").arg(static_cast<quint8>(data.at(i)),0,16));
 
         inputHex.append("|");
-        ui->textBrowserInput->append(id + "→ " + inputHex);
+        setStatusMessage(id + ":", StatusInput);
+        setStatusMessage(inputHex, StatusInput);
     }
 
     if(ui->checkBoxAddNewLine->isChecked())
@@ -405,6 +456,7 @@ void ConnectionWidget::onSettingsChanged()
     settings.showText = ui->checkBoxShowText->isChecked();
     settings.showHex = ui->checkBoxShowHex->isChecked();
     settings.addNewLine = ui->checkBoxAddNewLine->isChecked();
+    settings.scriptsDir = m_scriptsDir;
     settings.splitterH = TwoNumbers(ui->splitterH->sizes().at(0), ui->splitterH->sizes().at(1));
     settings.splitterV = TwoNumbers(ui->splitterV->sizes().at(0), ui->splitterV->sizes().at(1));
 

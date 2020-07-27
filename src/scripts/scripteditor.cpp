@@ -1,10 +1,12 @@
 #include "scripteditor.h"
 #include "ui_scripteditor.h"
 #include <QDebug>
+#include <QAction>
 
 ScriptEditor::ScriptEditor(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ScriptEditor)
+    ui(new Ui::ScriptEditor),
+    m_menuTemplates(new QMenu(this))
 {
     ui->setupUi(this);
     readTemplatesFile();
@@ -22,11 +24,12 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     connect(ui->btnOk, &QPushButton::clicked, this, &ScriptEditor::onBtnOkClicked);
     connect(ui->btnCancel, &QPushButton::clicked, [=]{reject();});
     connect(ui->btnClear, &QPushButton::clicked, this, &ScriptEditor::clear);
-    connect(ui->comboBoxScriptTemplates, SIGNAL(activated(QString)), this, SLOT(onComboTemplatesActivated(QString)));
+    connect(ui->btnTemplates, &QPushButton::clicked, this, &ScriptEditor::onBtnTemplatesClicked);
 }
 
 ScriptEditor::~ScriptEditor()
 {
+    delete m_menuTemplates;
     delete ui;
     delete m_highlighter;
 }
@@ -58,11 +61,13 @@ void ScriptEditor::onBtnOkClicked()
     accept();
 }
 
-void ScriptEditor::onComboTemplatesActivated(const QString &key)
+void ScriptEditor::onBtnTemplatesClicked()
 {
-    if (!m_templatesMap.contains(key)) return;
+    QAction *action = m_menuTemplates->exec(mapToGlobal(ui->btnTemplates->geometry().bottomLeft()));
+    if (!action) return;
 
-    ui->textEdit->append(m_templatesMap.value(key));
+    if(m_templatesMap.contains(action->text()))
+        ui->textEdit->append(m_templatesMap.value(action->text()));
 }
 
 void ScriptEditor::readTemplatesFile()
@@ -81,7 +86,7 @@ void ScriptEditor::readTemplatesFile()
     templates.remove("\r");
     QStringList lines = templates.split("\n");
     m_templatesMap.clear();
-    ui->comboBoxScriptTemplates->clear();
+    m_menuTemplates->clear();
     QString key, value;
 
     foreach (QString line, lines)
@@ -91,7 +96,8 @@ void ScriptEditor::readTemplatesFile()
             if(!key.isEmpty())
             {
                 m_templatesMap.insert(key, value);
-                ui->comboBoxScriptTemplates->addItem(key);
+                m_menuTemplates->addAction(key);
+
                 key.clear();
                 value.clear();
             }
@@ -104,7 +110,7 @@ void ScriptEditor::readTemplatesFile()
     }
 
     m_templatesMap.insert(key, value);
-    ui->comboBoxScriptTemplates->addItem(key);
+    m_menuTemplates->addAction(key);
 }
 
 // ********************************************************************************

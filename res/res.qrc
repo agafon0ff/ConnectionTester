@@ -23,5 +23,6 @@
         <file>icon_trash.png</file>
         <file>templates.js</file>
         <file>icon_save.png</file>
+        <file>icon_clock.png</file>
     </qresource>
 </RCC>

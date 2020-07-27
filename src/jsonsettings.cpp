@@ -124,6 +124,7 @@ NetSettingsStruct JsonSettings::settingsFromJson(const QJsonObject &jObject)
     settings.showHex = jObject.value(KEY_SHOW_HEX).toBool();
     settings.showText = jObject.value(KEY_SHOW_TEXT).toBool(true);
     settings.addNewLine = jObject.value(KEY_ADD_NEW_LINE).toBool();
+    settings.scriptsDir = jObject.value(KEY_SCRIPTS_DIR).toString();
 
     QStringList splitterH = jObject.value(KEY_SPLITTER_H).toString().split("|");
     QStringList splitterV = jObject.value(KEY_SPLITTER_V).toString().split("|");
@@ -153,6 +154,7 @@ QJsonObject JsonSettings::jsonFromSettings(const NetSettingsStruct &settings)
     jObject.insert(KEY_SHOW_HEX, settings.showHex);
     jObject.insert(KEY_SHOW_TEXT, settings.showText);
     jObject.insert(KEY_ADD_NEW_LINE, settings.addNewLine);
+    jObject.insert(KEY_SCRIPTS_DIR, settings.scriptsDir);
 
     jObject.insert(KEY_SPLITTER_H, QString::number(settings.splitterH.first) +
                    "|" + QString::number(settings.splitterH.second));

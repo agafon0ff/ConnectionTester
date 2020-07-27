@@ -24,6 +24,9 @@ private:
     JsonSettings *m_settings;
     ScriptEditor *m_scriptEditor;
     QString m_styleString;
+    QString m_sessionsDir;
+    QStringList m_recentSessions;
+    QList<QAction*> m_recentSessionActions;
 
     void closeEvent(QCloseEvent *e);
 
@@ -31,15 +34,21 @@ private slots:
     void addConnection(int type);
     ConnectionWidget *createConnection(int type, const NetSettingsStruct &settings);
     void onTabCloseRequested(int index);
+    void closeConnectionTab(int index);
+
 
     void setDefaultConnectionSettings(int type, const NetSettingsStruct &settings);
     void onScriptsMenuRequested();
     void onScriptActionRequested();
 
     void closeAllTabs();
+    bool checkSessionChanges();
 
-    void saveSession();
+    bool saveSession();
     void loadSession();
+    void openSession(const QString &path);
+    void updateRecentSessions(const QString &path = "");
+    void onRecentSessionTriggered(QAction *action);
 
     void saveSettings();
     void loadSettings();
