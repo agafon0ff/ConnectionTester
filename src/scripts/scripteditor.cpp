@@ -18,7 +18,14 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     font.setPointSize(10);
     QFontMetrics metrics(font);
     ui->textEdit->setFont(font);
+
+#if QT_VERSION > 0x050906
+    ui->textEdit->setTabStopDistance(4 * metrics.horizontalAdvance(' '));
+#else
     ui->textEdit->setTabStopWidth(4 * metrics.width(' '));
+#endif
+
+
     m_highlighter = new Highlighter(ui->textEdit->document());
 
     connect(ui->btnOk, &QPushButton::clicked, this, &ScriptEditor::onBtnOkClicked);

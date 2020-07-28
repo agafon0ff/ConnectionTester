@@ -71,6 +71,7 @@ private slots:
     void onSettingsChanged();
     void onSendClicked();
     void onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+    void onItemDoubleClicked(QListWidgetItem *item);
 };
 
 #endif // CONNECTIOWIDGET_H

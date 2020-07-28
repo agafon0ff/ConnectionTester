@@ -122,6 +122,6 @@ QScriptValue JsJSON::parse(const QString &text)
 
 QString JsJSON::stringify(const QScriptValue &value)
 {
-    QByteArray jsonData = QJsonDocument(jsonFromScript(value,m_engine).toObject()).toJson();
+    QByteArray jsonData = QJsonDocument(jsonFromScript(value,m_engine).toObject()).toJson(QJsonDocument::Compact);
     return QString::fromUtf8(jsonData);
 }

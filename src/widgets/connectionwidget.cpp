@@ -2,6 +2,7 @@
 #include "ui_connectionwidget.h"
 #include "scriptitemwidget.h"
 
+#include <QtGlobal>
 #include <QDebug>
 #include <QAction>
 #include <QFileInfo>
@@ -27,16 +28,25 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     ui->lineEditUdpSocketPort->setValidator(new QIntValidator(10, 999999, this));
     ui->lineEditUdpSocketPortDst->setValidator(new QIntValidator(10, 999999, this));
 
-    QFont font;
+    QFont font = QApplication::font();
     font.setFamily("Courier");
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
-    font.setPointSize(10);
+    font.setPointSize(9);
     QFontMetrics metrics(font);
+
     ui->textEditOutput->setFont(font);
-    ui->textEditOutput->setTabStopWidth(4 * metrics.width(' '));
     ui->textBrowserInput->setFont(font);
-    ui->textBrowserInput->setTabStopWidth(4 * metrics.width(' '));
+
+#if QT_VERSION > 0x050906
+    int tabStopDistance = 4 * metrics.horizontalAdvance(' ');
+    ui->textEditOutput->setTabStopDistance(tabStopDistance);
+    ui->textBrowserInput->setTabStopDistance(tabStopDistance);
+#else
+    int tabStopDistance = 4 * metrics.width(' ');
+    ui->textEditOutput->setTabStopWidth(tabStopDistance);
+    ui->textBrowserInput->setTabStopWidth(tabStopDistance);
+#endif
 
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clearHistory);
     connect(ui->btnClearInput, &QPushButton::clicked, ui->textBrowserInput, &QTextBrowser::clear);
@@ -61,6 +71,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(ui->splitterH, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->splitterV, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->listWidgetScripts, &QListWidget::currentItemChanged, this, &ConnectionWidget::onCurrentItemChanged);
+    connect(ui->listWidgetScripts, &QListWidget::itemDoubleClicked, this, &ConnectionWidget::onItemDoubleClicked);
 
     m_menuScriptEdit->addAction(QIcon(":/icon_edit.png"),tr("Edit Script"),this, &ConnectionWidget::onScriptEdit);
     m_menuScriptEdit->addAction(QIcon(":/icon_save.png"),tr("Save Script"),this, &ConnectionWidget::onScriptSave);
@@ -106,6 +117,7 @@ void ConnectionWidget::setNetConnection(NetConnection *pointer)
 
     connect(m_netConnection, &NetConnection::status, this, &ConnectionWidget::setStatusMessage);
     connect(m_netConnection, &NetConnection::datagram, this, &ConnectionWidget::setDatagram);
+    connect(m_netConnection, &NetConnection::clearText, ui->textBrowserInput, &QTextBrowser::clear);
 }
 
 void ConnectionWidget::setSettings(const NetSettingsStruct &settings)
@@ -191,7 +203,7 @@ void ConnectionWidget::onScriptLoad()
 
     int step = 0;
 
-    for (step; step<scriptText.size(); ++step)
+    for (step = 0; step<scriptText.size(); ++step)
         if(scriptText.at(step) == "\n")
             break;
 
@@ -408,14 +420,19 @@ void ConnectionWidget::setStatusMessage(const QString &message, int type)
 {
     QString color = "#eee";
 
-    if (type == StatusOk)
+    if (type == StatusType::StatusOk)
         color = "#5BC791";
-    else if (type == StatusError)
+    else if (type == StatusType::StatusError)
         color = "#CD6E6E";
-    else if (type == StatusConsole)
+    else if (type == StatusType::StatusConsole)
         color = "#D9D98B";
-    else if (type == StatusOutput)
+    else if (type == StatusType::StatusOutput)
         color = "#B7CEE5";
+    else
+    {
+        ui->textBrowserInput->append(message);
+        return;
+    }
 
     ui->textBrowserInput->append("<font color=\"" + color + "\">" + message + "</font>");
 }
@@ -444,6 +461,7 @@ void ConnectionWidget::setDatagram(const QByteArray &data, const QString &host, 
 
 void ConnectionWidget::onScriptContextMenuRequested(const QPoint &pos)
 {
+    Q_UNUSED(pos);
     m_menuScriptEdit->exec(QCursor::pos());
 }
 
@@ -502,4 +520,10 @@ void ConnectionWidget::onCurrentItemChanged(QListWidgetItem *current, QListWidge
 
     ScriptItemWidget *prewWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(previous));
     if (prewWidget) prewWidget->setActive(false);
+}
+
+void ConnectionWidget::onItemDoubleClicked(QListWidgetItem *item)
+{
+    Q_UNUSED(item);
+    onScriptEdit();
 }

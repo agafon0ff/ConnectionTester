@@ -105,7 +105,8 @@ ScriptItem::ScriptItem(QObject *parent) :
     m_jsJson(new JsJSON(m_engine))
 {
     connect(m_jsConsole, &JsConsole::logMessage,
-            [=](const QString &text){emit status(text, StatusConsole);});
+            [=](const QString &text){emit status(text, StatusType::StatusInput);});
+    connect(m_jsConsole, &JsConsole::clearText, this, &ScriptItem::clearText);
 }
 
 ScriptItem::~ScriptItem()

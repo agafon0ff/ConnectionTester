@@ -95,8 +95,8 @@ void TcpSocket::onSocketError(QAbstractSocket::SocketError socketError)
         break;
 
     case QAbstractSocket::HostNotFoundError:
-        break;
         m_socketError = "The remote host is not found";
+        break;
 
     case QAbstractSocket::ConnectionRefusedError:
         m_socketError = "Connection refused";

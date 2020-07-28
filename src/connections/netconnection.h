@@ -23,6 +23,7 @@ signals:
     void error(const QString &text);
     void status(const QString &text, int type);
     void datagram(const QByteArray &data, const QString &host, quint16 port);
+    void clearText();
 
 public slots:
     virtual void start(){}

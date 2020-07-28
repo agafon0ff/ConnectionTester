@@ -52,6 +52,7 @@ signals:
     void stopped();
     void status(const QString &text, int type);
     void datagram(const QByteArray &data, const QString &host, quint16 port);
+    void clearText();
 
 public slots:
     void setName(const QString &name);

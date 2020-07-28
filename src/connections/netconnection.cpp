@@ -28,6 +28,7 @@ ScriptItem *NetConnection::addScript(const QString &name, const QString &text)
     connect(this, &NetConnection::datagram, script, &ScriptItem::setDatagram);
     connect(script, &ScriptItem::datagram, this, &NetConnection::sendDatagram);
     connect(script, &ScriptItem::status, this, &NetConnection::status);
+    connect(script, &ScriptItem::clearText, this, &NetConnection::clearText);
 
     m_scriptsMap.insert(name, script);
     return script;

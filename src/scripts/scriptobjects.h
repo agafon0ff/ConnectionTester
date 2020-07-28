@@ -5,15 +5,24 @@
 #include <QScriptValue>
 #include <QScriptEngine>
 
+//!
+//! \brief The JsConsole class
+//!
 class JsConsole : public QObject
 {
     Q_OBJECT
 signals:
     void logMessage(const QString &text);
+    void clearText();
 public slots:
     void log(const QString &text){emit logMessage(text);}
+    void clear(){emit clearText();}
 };
 
+
+//!
+//! \brief The JsJSON class
+//!
 class JsJSON : public QObject
 {
     Q_OBJECT
