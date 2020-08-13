@@ -65,6 +65,7 @@
     <addaction name="actionTcpServer"/>
     <addaction name="actionTcpSocket"/>
     <addaction name="actionUdpSocket"/>
+    <addaction name="actionSerialPort"/>
    </widget>
    <widget class="QMenu" name="menuSession">
     <property name="title">
@@ -210,6 +211,15 @@
   <action name="actionEmpty">
    <property name="text">
     <string>Empty</string>
+   </property>
+  </action>
+  <action name="actionSerialPort">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/icon_plus.png</normaloff>:/icon_plus.png</iconset>
+   </property>
+   <property name="text">
+    <string>Serial Port</string>
    </property>
   </action>
  </widget>

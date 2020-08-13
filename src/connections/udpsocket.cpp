@@ -27,10 +27,10 @@ void UdpSocket::start()
     qDebug()<<"UdpSocket::start";
     closeSocket();
 
-    if(m_udpSocket->bind(QHostAddress::AnyIPv4,settings().port,
+    if (m_udpSocket->bind(QHostAddress::AnyIPv4,settings().port,
                          QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint))
     {
-        if(settings().useMulticast)
+        if (settings().useMulticast)
         {
             m_udpSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
             m_udpSocket->joinMulticastGroup(QHostAddress(settings().host));

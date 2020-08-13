@@ -113,11 +113,16 @@ QJsonValue jsonFromScript(const QScriptValue &value, QScriptEngine *engine)
 QScriptValue JsJSON::parse(const QString &text)
 {
     QJsonParseError jsonError;
-    QJsonObject jResult = QJsonDocument::fromJson(text.toUtf8(),&jsonError).object();
+    QJsonDocument jDoc = QJsonDocument::fromJson(text.toUtf8(),&jsonError);
     if(jsonError.error != QJsonParseError::NoError)
         return QScriptValue(QScriptValue::UndefinedValue);
 
-    return scriptFromJson(jResult, m_engine);
+    if(jDoc.isObject())
+        return scriptFromJson(jDoc.object(), m_engine);
+    else if(jDoc.isArray())
+        return scriptFromJson(jDoc.array(), m_engine);
+
+    return QScriptValue(QScriptValue::UndefinedValue);
 }
 
 QString JsJSON::stringify(const QScriptValue &value)

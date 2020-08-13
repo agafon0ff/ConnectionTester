@@ -1,6 +1,7 @@
 #include "connectionwidget.h"
 #include "ui_connectionwidget.h"
 #include "scriptitemwidget.h"
+#include "serialport.h"
 
 #include <QtGlobal>
 #include <QDebug>
@@ -27,6 +28,8 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     ui->lineEditTcpSocketPort->setValidator(new QIntValidator(10, 999999, this));
     ui->lineEditUdpSocketPort->setValidator(new QIntValidator(10, 999999, this));
     ui->lineEditUdpSocketPortDst->setValidator(new QIntValidator(10, 999999, this));
+
+    ui->comboBoxPortName->addItems(SerialPort::availablePorts());
 
     QFont font = QApplication::font();
     font.setFamily("Courier");
@@ -70,6 +73,9 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(ui->lineEditUdpSocketHostDst, &QLineEdit::editingFinished, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->splitterH, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->splitterV, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
+
+    connect(ui->comboBoxPortName, &QComboBox::textActivated, this, &ConnectionWidget::onSettingsChanged);
+
     connect(ui->listWidgetScripts, &QListWidget::currentItemChanged, this, &ConnectionWidget::onCurrentItemChanged);
     connect(ui->listWidgetScripts, &QListWidget::itemDoubleClicked, this, &ConnectionWidget::onItemDoubleClicked);
 
@@ -145,6 +151,10 @@ void ConnectionWidget::setSettings(const NetSettingsStruct &settings)
         ui->checkBoxUdpMulticast->setChecked(settings.useMulticast);
 
         ui->lineEditUdpSocketHost->setEnabled(ui->checkBoxUdpMulticast->isChecked());
+    }
+    else if (m_type == ConnectionSerialPort)
+    {
+        ui->comboBoxPortName->setCurrentText(settings.host);
     }
 
     ui->checkBoxAutoStart->setChecked(settings.autoStart);
@@ -494,6 +504,10 @@ void ConnectionWidget::onSettingsChanged()
         settings.portDst = static_cast<quint16>(ui->lineEditUdpSocketPortDst->text().toInt());
         settings.hostDst = ui->lineEditUdpSocketHostDst->text();
         settings.useMulticast = ui->checkBoxUdpMulticast->isChecked();
+    }
+    else if (m_type == ConnectionSerialPort)
+    {
+        settings.host = ui->comboBoxPortName->currentText();
     }
 
     m_netConnection->setSettings(settings);

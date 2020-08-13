@@ -3,6 +3,7 @@
 #include "tcpserver.h"
 #include "tcpsocket.h"
 #include "udpsocket.h"
+#include "serialport.h"
 
 #include <QFontDatabase>
 #include <QApplication>
@@ -10,6 +11,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPushButton>
+#include <QTabBar>
 #include <QDebug>
 #include <QFile>
 
@@ -31,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionTcpServer, &QAction::triggered, [=]{addConnection(ConnectionTcpServer);});
     connect(ui->actionTcpSocket, &QAction::triggered, [=]{addConnection(ConnectionTcpSocket);});
     connect(ui->actionUdpSocket, &QAction::triggered, [=]{addConnection(ConnectionUdpSocket);});
+    connect(ui->actionSerialPort, &QAction::triggered, [=]{addConnection(ConnectionSerialPort);});
     connect(ui->actionSessionSave, &QAction::triggered, this, &MainWindow::saveSession);
     connect(ui->actionSessionLoad, &QAction::triggered, this, &MainWindow::loadSession);
     connect(ui->menuRecentSessions, &QMenu::triggered, this, &MainWindow::onRecentSessionTriggered);
@@ -85,6 +88,8 @@ ConnectionWidget *MainWindow::createConnection(int type, const NetSettingsStruct
         netConnection = dynamic_cast<NetConnection*>(new TcpSocket(this));
     else if (type == ConnectionUdpSocket)
         netConnection = dynamic_cast<NetConnection*>(new UdpSocket(this));
+    else if (type == ConnectionSerialPort)
+        netConnection = dynamic_cast<NetConnection*>(new SerialPort(this));
 
     if (!netConnection)
         return Q_NULLPTR;

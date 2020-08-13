@@ -1,4 +1,4 @@
-QT  += core gui widgets network websockets script
+QT  += core gui widgets network websockets serialport script
 
 TARGET = ConnectionTester
 TEMPLATE = app
@@ -12,6 +12,7 @@ INCLUDEPATH += \
     src/widgets
 
 SOURCES += \
+    src/connections/serialport.cpp \
     src/main.cpp \
     src/jsonsettings.cpp \
     src/widgets/mainwindow.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
     src/scripts/scriptobjects.cpp
 
 HEADERS += \
+    src/connections/serialport.h \
     src/global.h \
     src/jsonsettings.h \
     src/widgets/mainwindow.h \
