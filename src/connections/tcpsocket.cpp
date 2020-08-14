@@ -31,19 +31,23 @@ void TcpSocket::start()
     qDebug()<<"TcpSocket::start";
 
     closeSocket();
+
+    const QString host = settings().value(KEY_HOST).toString();
+    const quint16 port = static_cast<quint16>(settings().value(KEY_PORT).toInt());
+
     m_socketError.clear();
-    m_tcpSocket->connectToHost(settings().host, settings().port);
+    m_tcpSocket->connectToHost(host, port);
 
     if(m_tcpSocket->waitForConnected(1000))
     {
         emit started();
-        emit status("OK: TCP-Socket connected to: " + settings().host + ":" +
-                     QString::number(settings().port), StatusOk);
+        emit status("OK: TCP-Socket connected to: " + host + ":" +
+                     QString::number(port), StatusOk);
     }
     else
     {
-        emit status("ERROR: TCP-Socket could not connect to: " + settings().host +
-                     ":" + QString::number(settings().port), StatusError);
+        emit status("ERROR: TCP-Socket could not connect to: " + host +
+                     ":" + QString::number(port), StatusError);
     }
 }
 

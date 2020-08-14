@@ -32,12 +32,12 @@ private:
 
 private slots:
     void addConnection(int type);
-    ConnectionWidget *createConnection(int type, const NetSettingsStruct &settings);
+    ConnectionWidget *createConnection(int type, const QJsonObject &settings);
     void onTabCloseRequested(int index);
     void closeConnectionTab(int index);
 
 
-    void setDefaultConnectionSettings(int type, const NetSettingsStruct &settings);
+    void setDefaultConnectionSettings(int type, const QJsonObject &settings);
     void onScriptsMenuRequested();
     void onScriptActionRequested();
 

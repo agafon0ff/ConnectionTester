@@ -25,7 +25,7 @@ void TcpServer::closeServer()
 
         disconnect(m_tcpServer, &QTcpServer::newConnection, this, &TcpServer::onSocketConnected);
 
-        for(int i=0; i<m_tcpSockets.size(); ++i)
+        for (int i=0; i<m_tcpSockets.size(); ++i)
             m_tcpSockets.values().at(i)->disconnectFromHost();
 
         m_tcpServer->close();
@@ -39,17 +39,19 @@ void TcpServer::start()
 
     closeServer();
 
-    if(m_tcpServer->listen(QHostAddress::AnyIPv4, settings().port))
+    const quint16 port = static_cast<quint16>(settings().value(KEY_PORT).toInt());
+
+    if (m_tcpServer->listen(QHostAddress::AnyIPv4, port))
     {
         connect(m_tcpServer, &QTcpServer::newConnection, this, &TcpServer::onSocketConnected);
         emit started();
         emit status("OK: TCP-Server is started on port: " +
-                     QString::number(settings().port), StatusOk);
+                     QString::number(port), StatusOk);
     }
     else
     {
         emit status("ERROR: TCP-Server is not started on port: " +
-                     QString::number(settings().port), StatusError);
+                     QString::number(port), StatusError);
     }
 }
 

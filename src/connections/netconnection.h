@@ -1,6 +1,7 @@
 #ifndef NETCONNECTION_H
 #define NETCONNECTION_H
 
+#include <QJsonObject>
 #include <QObject>
 #include <QMap>
 #include "global.h"
@@ -14,7 +15,7 @@ public:
     virtual ~NetConnection();
 
 private:
-    NetSettingsStruct m_settings;
+    QJsonObject m_settings;
     QMap<QString, ScriptItem*> m_scriptsMap;
 
 signals:
@@ -35,8 +36,8 @@ public slots:
     virtual int type(){return -1;}
     virtual QString getTypeString(){return "";}
 
-    void setSettings(const NetSettingsStruct &settings){m_settings = settings;}
-    inline NetSettingsStruct settings(){return m_settings;}
+    void setSettings(const QJsonObject &settings){m_settings = settings;}
+    inline QJsonObject settings(){return m_settings;}
 
     ScriptItem *addScript(const QString &name, const QString &text);
     QString scriptText(const QString &name);

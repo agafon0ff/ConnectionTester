@@ -27,8 +27,12 @@ void SerialPort::start()
     qDebug()<<"SerialPort::start";
 
     closePort();
-    m_serialPort->setPortName(settings().host);
-    m_serialPort->setBaudRate(QSerialPort::Baud9600);
+
+    const QString portName = settings().value(KEY_SERIAL_PORT).toString();
+    const int baudRate = settings().value(KEY_BAUDRATE).toInt();
+
+    m_serialPort->setPortName(portName);
+    m_serialPort->setBaudRate(baudRate);
     m_serialPort->setDataBits(QSerialPort::Data8);
     m_serialPort->setParity(QSerialPort::NoParity);
     m_serialPort->setStopBits(QSerialPort::OneStop);
@@ -37,12 +41,12 @@ void SerialPort::start()
     if (m_serialPort->open(QIODevice::ReadWrite))
     {
         emit started();
-        emit status("OK: Serial-Port is open: " + settings().host, StatusOk);
+        emit status("OK: Serial-Port is open: " + portName, StatusOk);
     }
     else
     {
         emit status("ERROR: Serial-Port сould not open: " +
-                     settings().host, StatusError);
+                     portName, StatusError);
     }
 }
 
@@ -52,7 +56,7 @@ void SerialPort::stop()
 
     closePort();
     emit stopped();
-    emit status("OK: UDP-Socket stopped", StatusOk);
+    emit status("OK: Serial-Port stopped", StatusOk);
 }
 
 void SerialPort::sendDatagram(const QByteArray &data, const QString &host, quint16 port)

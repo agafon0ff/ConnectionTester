@@ -30,9 +30,6 @@ public slots:
 
     void saveJson(const QString &fileName, const QJsonObject &jObject);
     QJsonObject loadJson(const QString &fileName);
-
-    NetSettingsStruct settingsFromJson(const QJsonObject &jObject);
-    QJsonObject jsonFromSettings(const NetSettingsStruct &settings);
 };
 
 #endif // JSONSETTINGS_H

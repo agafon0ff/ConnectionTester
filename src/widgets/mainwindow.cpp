@@ -72,11 +72,10 @@ void MainWindow::addConnection(int type)
 
     QJsonObject defaultSettings = m_settings->getJsonObject(KEY_DEFAULT);
     QJsonObject jSettings = defaultSettings.value(CONNECTION_TYPES.at(type)).toObject();
-    NetSettingsStruct settings = m_settings->settingsFromJson(jSettings);
-    createConnection(type, settings);
+    createConnection(type, jSettings);
 }
 
-ConnectionWidget *MainWindow::createConnection(int type, const NetSettingsStruct &settings)
+ConnectionWidget *MainWindow::createConnection(int type, const QJsonObject &settings)
 {
     qDebug()<<"MainWindow::addConnection, type:"<<CONNECTION_TYPES.at(type);
 
@@ -135,11 +134,10 @@ void MainWindow::closeConnectionTab(int index)
     delete netConnection;
 }
 
-void MainWindow::setDefaultConnectionSettings(int type, const NetSettingsStruct &settings)
+void MainWindow::setDefaultConnectionSettings(int type, const QJsonObject &settings)
 {
     QJsonObject defaultSettings = m_settings->getJsonObject(KEY_DEFAULT);
-    QJsonObject jSettings = m_settings->jsonFromSettings(settings);
-    defaultSettings.insert(CONNECTION_TYPES.at(type), jSettings);
+    defaultSettings.insert(CONNECTION_TYPES.at(type), settings);
     m_settings->setJsonObject(KEY_DEFAULT, defaultSettings);
 }
 
@@ -274,7 +272,7 @@ bool MainWindow::saveSession()
 
         QJsonObject jConnection;
         jConnection.insert(KEY_CONNECTION_TYPE, CONNECTION_TYPES.at(netConnection->type()));
-        jConnection.insert(KEY_SETTINGS, m_settings->jsonFromSettings(widget->settings()));
+        jConnection.insert(KEY_SETTINGS, widget->settings());
 
         QJsonArray jScriptsList;
         QStringList scriptNames = widget->scriptsNames();
@@ -324,8 +322,7 @@ void MainWindow::openSession(const QString &path)
         QJsonObject jSettings = jConnection.value(KEY_SETTINGS).toObject();
         QString type = jConnection.value(KEY_CONNECTION_TYPE).toString();
 
-        ConnectionWidget *widget = createConnection(CONNECTION_TYPES.indexOf(type),
-                                                    m_settings->settingsFromJson(jSettings));
+        ConnectionWidget *widget = createConnection(CONNECTION_TYPES.indexOf(type), jSettings);
 
         QJsonArray jScriptsList = jConnection.value(KEY_SCRIPTS).toArray();
         foreach (const QJsonValue &jSriptValue, jScriptsList)

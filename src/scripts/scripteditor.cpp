@@ -125,14 +125,6 @@ void ScriptEditor::readTemplatesFile()
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
-    addRule("\\b[A-Za-z0-9_]+(?=\\()", QBrush("#ddca7e"));
-    addRule("\\b[+-]?[0-9]+[lL]?\\b", QBrush("#CFA790"));
-    addRule("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b", QBrush("#CFA790"));
-    addRule("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b", QBrush("#CFA790"));
-    addRule("//[^\n]*", QBrush("#567790"));
-    addRule("\"([^\"\"]*)\"", QBrush("#A6D49B"));
-    addRule("'([^'']*)'", QBrush("#A6D49B"));
-
     QStringList keywords = { "class", "var", "let", "new", "return", "if",
                              "else", "break", "true", "false", "function"};
 
@@ -144,6 +136,14 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     foreach (const QString &key, operators)
         addRule(key, QBrush("#CFC5d3"));
+
+    addRule("\\b[A-Za-z0-9_]+(?=\\()", QBrush("#ddca7e"));
+    addRule("\\b[+-]?[0-9]+[lL]?\\b", QBrush("#CFA790"));
+    addRule("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b", QBrush("#CFA790"));
+    addRule("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b", QBrush("#CFA790"));
+    addRule("//[^\n]*", QBrush("#567790"));
+    addRule("\"([^\"\"]*)\"", QBrush("#A6D49B"));
+    addRule("'([^'']*)'", QBrush("#A6D49B"));
 
     multiLineCommentFormat.setForeground(Qt::red);
     commentStartExpression = QRegExp("/\\*");

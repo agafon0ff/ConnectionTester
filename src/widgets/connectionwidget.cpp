@@ -24,12 +24,13 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     ui->splitterV->setSizes({800, 100});
     ui->splitterH->setSizes({800, 100});
     ui->btnStart->setText(KEY_START);
-    ui->lineEditTcpServerPort->setValidator(new QIntValidator(10, 999999, this));
-    ui->lineEditTcpSocketPort->setValidator(new QIntValidator(10, 999999, this));
-    ui->lineEditUdpSocketPort->setValidator(new QIntValidator(10, 999999, this));
-    ui->lineEditUdpSocketPortDst->setValidator(new QIntValidator(10, 999999, this));
+    ui->lineEditTcpServerPort->setValidator(new QIntValidator(1, 999999, this));
+    ui->lineEditTcpSocketPort->setValidator(new QIntValidator(1, 999999, this));
+    ui->lineEditUdpSocketPort->setValidator(new QIntValidator(1, 999999, this));
+    ui->lineEditUdpSocketPortDst->setValidator(new QIntValidator(1, 999999, this));
 
     ui->comboBoxPortName->addItems(SerialPort::availablePorts());
+    ui->comboBoxBaudrate->addItems({"1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"});
 
     QFont font = QApplication::font();
     font.setFamily("Courier");
@@ -75,6 +76,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(ui->splitterV, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
 
     connect(ui->comboBoxPortName, &QComboBox::textActivated, this, &ConnectionWidget::onSettingsChanged);
+    connect(ui->comboBoxBaudrate, &QComboBox::textActivated, this, &ConnectionWidget::onSettingsChanged);
 
     connect(ui->listWidgetScripts, &QListWidget::currentItemChanged, this, &ConnectionWidget::onCurrentItemChanged);
     connect(ui->listWidgetScripts, &QListWidget::itemDoubleClicked, this, &ConnectionWidget::onItemDoubleClicked);
@@ -126,7 +128,7 @@ void ConnectionWidget::setNetConnection(NetConnection *pointer)
     connect(m_netConnection, &NetConnection::clearText, ui->textBrowserInput, &QTextBrowser::clear);
 }
 
-void ConnectionWidget::setSettings(const NetSettingsStruct &settings)
+void ConnectionWidget::setSettings(const QJsonObject &settings)
 {
     qDebug()<<"ConnectionWidget::setSettings";
 
@@ -135,50 +137,49 @@ void ConnectionWidget::setSettings(const NetSettingsStruct &settings)
 
     if (m_type == ConnectionTcpServer)
     {
-        ui->lineEditTcpServerPort->setText(QString::number(settings.port));
+        ui->lineEditTcpServerPort->setText(QString::number(settings.value(KEY_PORT).toInt()));
     }
     else if (m_type == ConnectionTcpSocket)
     {
-        ui->lineEditTcpSocketHost->setText(settings.host);
-        ui->lineEditTcpSocketPort->setText(QString::number(settings.port));
+        ui->lineEditTcpSocketHost->setText(settings.value(KEY_HOST).toString());
+        ui->lineEditTcpSocketPort->setText(QString::number(settings.value(KEY_PORT).toInt()));
     }
     else if (m_type == ConnectionUdpSocket)
     {
-        ui->lineEditUdpSocketHost->setText(settings.host);
-        ui->lineEditUdpSocketHostDst->setText(settings.hostDst);
-        ui->lineEditUdpSocketPort->setText(QString::number(settings.port));
-        ui->lineEditUdpSocketPortDst->setText(QString::number(settings.portDst));
-        ui->checkBoxUdpMulticast->setChecked(settings.useMulticast);
+        ui->lineEditUdpSocketHost->setText(settings.value(KEY_HOST).toString());
+        ui->lineEditUdpSocketHostDst->setText(settings.value(KEY_HOST_DST).toString());
+        ui->lineEditUdpSocketPort->setText(QString::number(settings.value(KEY_PORT).toInt()));
+        ui->lineEditUdpSocketPortDst->setText(QString::number(settings.value(KEY_PORT_DST).toInt()));
+        ui->checkBoxUdpMulticast->setChecked(settings.value(KEY_USE_MULTICAST).toBool());
 
         ui->lineEditUdpSocketHost->setEnabled(ui->checkBoxUdpMulticast->isChecked());
     }
     else if (m_type == ConnectionSerialPort)
     {
-        ui->comboBoxPortName->setCurrentText(settings.host);
+        ui->comboBoxPortName->setCurrentText(settings.value(KEY_SERIAL_PORT).toString());
+        ui->comboBoxBaudrate->setCurrentText(QString::number(settings.value(KEY_BAUDRATE).toInt()));
     }
 
-    ui->checkBoxAutoStart->setChecked(settings.autoStart);
-    ui->checkBoxShowText->setChecked(settings.showText);
-    ui->checkBoxShowHex->setChecked(settings.showHex);
-    ui->checkBoxAddNewLine->setChecked(settings.addNewLine);
+    ui->checkBoxAutoStart->setChecked(settings.value(KEY_AUTO_START).toBool());
+    ui->checkBoxShowText->setChecked(settings.value(KEY_SHOW_TEXT).toBool());
+    ui->checkBoxShowHex->setChecked(settings.value(KEY_SHOW_HEX).toBool());
+    ui->checkBoxAddNewLine->setChecked(settings.value(KEY_ADD_NEW_LINE).toBool());
 
     if (ui->checkBoxAutoStart->isChecked())
         m_netConnection->start();
 
-    m_scriptsDir = settings.scriptsDir;
-    ui->splitterH->setSizes(QList<int>() << settings.splitterH.first << settings.splitterH.second);
-    ui->splitterV->setSizes(QList<int>() << settings.splitterV.first << settings.splitterV.second);
+    m_scriptsDir = settings.value(KEY_SCRIPTS_DIR).toString();
+    ui->splitterH->restoreState(QByteArray::fromBase64(settings.value(KEY_SPLITTER_H).toString().toLocal8Bit()));
+    ui->splitterV->restoreState(QByteArray::fromBase64(settings.value(KEY_SPLITTER_V).toString().toLocal8Bit()));
 }
 
-NetSettingsStruct ConnectionWidget::settings()
+QJsonObject ConnectionWidget::settings()
 {
-    NetSettingsStruct netSettings = m_netConnection->settings();
-    netSettings.splitterH = TwoNumbers(ui->splitterH->sizes().at(0),
-                                       ui->splitterH->sizes().at(1));
-    netSettings.splitterV = TwoNumbers(ui->splitterV->sizes().at(0),
-                                       ui->splitterV->sizes().at(1));
+    QJsonObject settings = m_netConnection->settings();
+    settings.insert(KEY_SPLITTER_H, QString::fromLocal8Bit(ui->splitterH->saveState().toBase64()));
+    settings.insert(KEY_SPLITTER_V, QString::fromLocal8Bit(ui->splitterV->saveState().toBase64()));
 
-    return netSettings;
+    return settings;
 }
 
 bool ConnectionWidget::isChanged()
@@ -479,35 +480,36 @@ void ConnectionWidget::onSettingsChanged()
 {
     if (!m_netConnection) return;
 
-    NetSettingsStruct settings;
-    settings.autoStart = ui->checkBoxAutoStart->isChecked();
-    settings.showText = ui->checkBoxShowText->isChecked();
-    settings.showHex = ui->checkBoxShowHex->isChecked();
-    settings.addNewLine = ui->checkBoxAddNewLine->isChecked();
-    settings.scriptsDir = m_scriptsDir;
-    settings.splitterH = TwoNumbers(ui->splitterH->sizes().at(0), ui->splitterH->sizes().at(1));
-    settings.splitterV = TwoNumbers(ui->splitterV->sizes().at(0), ui->splitterV->sizes().at(1));
+    QJsonObject settings;
+    settings.insert(KEY_AUTO_START, ui->checkBoxAutoStart->isChecked());
+    settings.insert(KEY_SHOW_TEXT, ui->checkBoxShowText->isChecked());
+    settings.insert(KEY_SHOW_HEX, ui->checkBoxShowHex->isChecked());
+    settings.insert(KEY_ADD_NEW_LINE, ui->checkBoxAddNewLine->isChecked());
+    settings.insert(KEY_SCRIPTS_DIR, m_scriptsDir);
+    settings.insert(KEY_SPLITTER_H, QString::fromLocal8Bit(ui->splitterH->saveState().toBase64()));
+    settings.insert(KEY_SPLITTER_V, QString::fromLocal8Bit(ui->splitterV->saveState().toBase64()));
 
     if (m_type == ConnectionTcpServer)
     {
-        settings.port = static_cast<quint16>(ui->lineEditTcpServerPort->text().toInt());
+        settings.insert(KEY_PORT, ui->lineEditTcpServerPort->text().toInt());
     }
     else if (m_type == ConnectionTcpSocket)
     {
-        settings.port = static_cast<quint16>(ui->lineEditTcpSocketPort->text().toInt());
-        settings.host = ui->lineEditTcpSocketHost->text();
+        settings.insert(KEY_PORT, ui->lineEditTcpSocketPort->text().toInt());
+        settings.insert(KEY_HOST, ui->lineEditTcpSocketHost->text());
     }
     else if (m_type == ConnectionUdpSocket)
     {
-        settings.port = static_cast<quint16>(ui->lineEditUdpSocketPort->text().toInt());
-        settings.host = ui->lineEditUdpSocketHost->text();
-        settings.portDst = static_cast<quint16>(ui->lineEditUdpSocketPortDst->text().toInt());
-        settings.hostDst = ui->lineEditUdpSocketHostDst->text();
-        settings.useMulticast = ui->checkBoxUdpMulticast->isChecked();
+        settings.insert(KEY_PORT, ui->lineEditUdpSocketPort->text().toInt());
+        settings.insert(KEY_HOST, ui->lineEditUdpSocketHost->text());
+        settings.insert(KEY_PORT_DST, ui->lineEditUdpSocketPortDst->text().toInt());
+        settings.insert(KEY_HOST_DST, ui->lineEditUdpSocketHostDst->text());
+        settings.insert(KEY_USE_MULTICAST, ui->checkBoxUdpMulticast->isChecked());
     }
     else if (m_type == ConnectionSerialPort)
     {
-        settings.host = ui->comboBoxPortName->currentText();
+        settings.insert(KEY_SERIAL_PORT, ui->comboBoxPortName->currentText());
+        settings.insert(KEY_BAUDRATE, ui->comboBoxBaudrate->currentText().toInt());
     }
 
     m_netConnection->setSettings(settings);
@@ -520,8 +522,8 @@ void ConnectionWidget::onSendClicked()
         return;
 
     QString text = ui->textEditOutput->toPlainText();
-    QString host = m_netConnection->settings().hostDst;
-    quint16 port = m_netConnection->settings().portDst;
+    QString host = m_netConnection->settings().value(KEY_HOST_DST).toString();
+    quint16 port = m_netConnection->settings().value(KEY_PORT_DST).toInt();
     m_netConnection->sendDatagram(text.toUtf8(), host, port);
 
     setStatusMessage("← " + text, StatusOutput);

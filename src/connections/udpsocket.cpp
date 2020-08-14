@@ -27,23 +27,26 @@ void UdpSocket::start()
     qDebug()<<"UdpSocket::start";
     closeSocket();
 
-    if (m_udpSocket->bind(QHostAddress::AnyIPv4,settings().port,
+    const QString host = settings().value(KEY_HOST).toString();
+    const quint16 port = static_cast<quint16>(settings().value(KEY_PORT).toInt());
+
+    if (m_udpSocket->bind(QHostAddress::AnyIPv4, port,
                          QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint))
     {
-        if (settings().useMulticast)
+        if (settings().value(KEY_USE_MULTICAST).toBool())
         {
             m_udpSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
-            m_udpSocket->joinMulticastGroup(QHostAddress(settings().host));
+            m_udpSocket->joinMulticastGroup(QHostAddress(host));
         }
 
         emit started();
         emit status("OK: UDP-Socket is listening on port: " +
-                     QString::number(settings().port), StatusOk);
+                     QString::number(port), StatusOk);
     }
     else
     {
         emit status("ERROR: UDP-Socket сould not open port: " +
-                     QString::number(settings().port), StatusError);
+                     QString::number(port), StatusError);
     }
 }
 

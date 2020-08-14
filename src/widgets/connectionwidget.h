@@ -4,6 +4,7 @@
 #include <QMenu>
 #include <QWidget>
 #include <QSplitter>
+#include <QJsonObject>
 #include "netconnection.h"
 #include "scripteditor.h"
 #include "scriptitem.h"
@@ -35,7 +36,7 @@ private:
     bool m_isConnectionChanged;
 
 signals:
-    void defaultSettings(int type, const NetSettingsStruct &settings);
+    void defaultSettings(int type, const QJsonObject &settings);
     void showScriptMenu();
 
 public slots:
@@ -45,8 +46,8 @@ public slots:
     void setNetConnection(NetConnection *pointer);
     inline NetConnection *netConnection(){return m_netConnection;}
 
-    void setSettings(const NetSettingsStruct &settings);
-    NetSettingsStruct settings();
+    void setSettings(const QJsonObject &settings);
+    QJsonObject settings();
 
     bool isChanged();
     void applyChanges();
