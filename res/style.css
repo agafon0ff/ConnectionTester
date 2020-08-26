@@ -410,8 +410,8 @@ QRadioButton::indicator:checked {
 }
 
 QComboBox {
-    background: #222;
-    border: 1px solid #222;
+    background: #333;
+    border: 1px solid #333;
     border-radius: 2px;
     padding: 1px 10px 1px 3px;
     color: #ddd;
@@ -434,7 +434,7 @@ QComboBox::down-arrow:disabled {
 }
 QComboBox:disabled {
     background: #444;
-    border: 1px solid #333;
+    border: 1px solid #444;
     color: #333;
 }
 
