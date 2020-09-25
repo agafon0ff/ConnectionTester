@@ -52,12 +52,6 @@
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionExit"/>
-   </widget>
    <widget class="QMenu" name="menuNew">
     <property name="title">
      <string>Connections</string>
@@ -95,7 +89,6 @@
     <addaction name="actionDublicateScript"/>
     <addaction name="actionScriptRemove"/>
    </widget>
-   <addaction name="menuFile"/>
    <addaction name="menuNew"/>
    <addaction name="menuSession"/>
    <addaction name="menuScripts"/>

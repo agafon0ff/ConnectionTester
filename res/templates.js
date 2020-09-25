@@ -123,3 +123,22 @@ function onScriptStart()
     var jsonText = JSON.stringify(tmpObject);
     console.log(jsonText);
 }
+
+/* HTTP GET request */
+var getRequest = "GET / HTTP/1.1\r\n\
+Host: 216.239.38.120:80\r\n\
+Connection: keep-alive\r\n\
+Upgrade-Insecure-Requests: 1\r\n\
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\n\
+Accept: text/html,q=0.9,image/webp,image/apng;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n\
+Sec-Fetch-Site: none\r\n\
+Sec-Fetch-Mode: navigate\r\n\
+Sec-Fetch-User: ?1\r\n\
+Sec-Fetch-Dest: document\r\n\
+Accept-Encoding: gzip, deflate, br\r\n\
+Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7\r\n\r\n\r\n";
+
+function onScriptStart()
+{
+    writeText(getRequest, '', 80);
+}
