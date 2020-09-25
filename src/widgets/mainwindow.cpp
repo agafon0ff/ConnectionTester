@@ -28,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent) :
     loadStyleSheet();
     setWindowIcon(QIcon(":/connection.ico"));
 
-    connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
     connect(ui->tabWidgetCentral, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabCloseRequested);
     connect(ui->actionTcpServer, &QAction::triggered, [=]{addConnection(ConnectionTcpServer);});
     connect(ui->actionTcpSocket, &QAction::triggered, [=]{addConnection(ConnectionTcpSocket);});
