@@ -75,8 +75,8 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     connect(ui->splitterH, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
     connect(ui->splitterV, &QSplitter::splitterMoved, this, &ConnectionWidget::onSettingsChanged);
 
-    connect(ui->comboBoxPortName, &QComboBox::textActivated, this, &ConnectionWidget::onSettingsChanged);
-    connect(ui->comboBoxBaudrate, &QComboBox::textActivated, this, &ConnectionWidget::onSettingsChanged);
+    connect(ui->comboBoxPortName, &QComboBox::currentTextChanged, this, &ConnectionWidget::onSettingsChanged);
+    connect(ui->comboBoxBaudrate, &QComboBox::currentTextChanged, this, &ConnectionWidget::onSettingsChanged);
 
     connect(ui->listWidgetScripts, &QListWidget::currentItemChanged, this, &ConnectionWidget::onCurrentItemChanged);
     connect(ui->listWidgetScripts, &QListWidget::itemDoubleClicked, this, &ConnectionWidget::onItemDoubleClicked);
