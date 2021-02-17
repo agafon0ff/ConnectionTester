@@ -73,6 +73,7 @@ QPushButton {
     padding: 3px 5px 3px 5px;
     min-width: 60px;
     min-height: 18px;
+    outline: none;
 }
 
 QPushButton::pressed:hover {
@@ -93,6 +94,7 @@ QToolButton {
     border-radius: 2px;
     color: #ddd;
     padding: 2px;
+    outline: none;
 }
 
 QToolButton::pressed:hover {
@@ -225,6 +227,7 @@ QTabBar::tab {
     border-top-right-radius: 2px;
     color: #ddd;
     margin: 1px;
+    outline: none;
 }
 QTabBar::tab:!selected:hover, QTabBar::tab:hover {
     background: #444;

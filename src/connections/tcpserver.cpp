@@ -8,12 +8,12 @@ const char* KEY_SOKET_HOST = "socketHost";
 TcpServer::TcpServer(QObject *parent) : NetConnection(parent),
     m_tcpServer(new QTcpServer(this))
 {
-    qDebug()<<"*TcpServer";
+    qDebug() << Q_FUNC_INFO;
 }
 
 TcpServer::~TcpServer()
 {
-    qDebug()<<"~TcpServer";
+    qDebug() << Q_FUNC_INFO;
     closeServer();
 }
 
@@ -21,7 +21,7 @@ void TcpServer::closeServer()
 {
     if(m_tcpServer->isListening())
     {
-        qDebug()<<"TcpServer::closeServer";
+        qDebug() << Q_FUNC_INFO;
 
         disconnect(m_tcpServer, &QTcpServer::newConnection, this, &TcpServer::onSocketConnected);
 
@@ -35,7 +35,7 @@ void TcpServer::closeServer()
 
 void TcpServer::start()
 {
-    qDebug()<<"TcpServer::start";
+    qDebug() << Q_FUNC_INFO;
 
     closeServer();
 
@@ -57,7 +57,7 @@ void TcpServer::start()
 
 void TcpServer::stop()
 {
-    qDebug()<<"TcpServer::stop";
+    qDebug() << Q_FUNC_INFO;
 
     closeServer();
 
@@ -98,7 +98,7 @@ void TcpServer::onSocketConnected()
     m_tcpSockets.insert(id, socket);
 
     emit status("Connected: " + id, StatusConsole);
-    qDebug() << "TcpServer::onSocketConnected" << id;
+    qDebug() << Q_FUNC_INFO << id;
 }
 
 void TcpServer::onSocketDisconnected()
@@ -111,7 +111,7 @@ void TcpServer::onSocketDisconnected()
     socket->deleteLater();
 
     emit status("Disconnected: " + id, StatusConsole);
-    qDebug() << "TcpServer::onSocketDisconnected" << id;
+    qDebug() << Q_FUNC_INFO << id;
 }
 
 void TcpServer::onSocketReadyRead()

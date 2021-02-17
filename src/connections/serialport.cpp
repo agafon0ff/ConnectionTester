@@ -6,17 +6,17 @@ SerialPort::SerialPort(QObject *parent) : NetConnection(parent),
     m_serialPort(new QSerialPort(this))
 {
     connect(m_serialPort, &QSerialPort::readyRead, this, &SerialPort::onReadyRead);
-    qDebug()<<"*SerialPort";
+    qDebug() << Q_FUNC_INFO;
 }
 
 SerialPort::~SerialPort()
 {
-    qDebug()<<"~SerialPort";
+    qDebug() << Q_FUNC_INFO;
 }
 
 void SerialPort::closePort()
 {
-    qDebug()<<"SerialPort::closePort";
+    qDebug() << Q_FUNC_INFO;
 
     if(m_serialPort->isOpen())
         m_serialPort->close();
@@ -24,7 +24,7 @@ void SerialPort::closePort()
 
 void SerialPort::start()
 {
-    qDebug()<<"SerialPort::start";
+    qDebug() << Q_FUNC_INFO;
 
     closePort();
 
@@ -52,7 +52,7 @@ void SerialPort::start()
 
 void SerialPort::stop()
 {
-    qDebug()<<"SerialPort::stop";
+    qDebug() << Q_FUNC_INFO;
 
     closePort();
     emit stopped();

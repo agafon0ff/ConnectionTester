@@ -86,18 +86,18 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     m_menuScriptEdit->addAction(QIcon(":/icon_copy.png"),tr("Duplicate Script"),this, &ConnectionWidget::onScriptDuplicate);
     m_menuScriptEdit->addAction(QIcon(":/icon_cross.png"),tr("Remove Script"),this, &ConnectionWidget::onScriptRemove);
 
-    qDebug()<<"*ConnectionWidget";
+    qDebug() << Q_FUNC_INFO;
 }
 
 ConnectionWidget::~ConnectionWidget()
 {
-    qDebug()<<"~ConnectionWidget";
+    qDebug() << Q_FUNC_INFO;
     delete ui;
 }
 
 void ConnectionWidget::setType(int type)
 {
-    qDebug()<<"ConnectionWidget::setType: "<<type;
+    qDebug() << Q_FUNC_INFO<<type;
 
     if(type < 0 || type >= ui->stackedWidgetSettings->count())
         return;
@@ -108,7 +108,7 @@ void ConnectionWidget::setType(int type)
 
 void ConnectionWidget::setNetConnection(NetConnection *pointer)
 {
-    qDebug()<<"ConnectionWidget::setNetConnection";
+    qDebug() << Q_FUNC_INFO;
 
     if(!pointer)return;
 
@@ -130,7 +130,7 @@ void ConnectionWidget::setNetConnection(NetConnection *pointer)
 
 void ConnectionWidget::setSettings(const QJsonObject &settings)
 {
-    qDebug()<<"ConnectionWidget::setSettings";
+    qDebug() << Q_FUNC_INFO;
 
     if (!m_netConnection)
         return;
@@ -240,7 +240,7 @@ void ConnectionWidget::onScriptLoad()
 
 void ConnectionWidget::onScriptSave()
 {
-    qDebug()<<"ConnectionWidget::onScriptSave";
+    qDebug() << Q_FUNC_INFO;
 
     QListWidgetItem *listItem = ui->listWidgetScripts->currentItem();
     ScriptItemWidget *itemWidget = dynamic_cast<ScriptItemWidget*>(ui->listWidgetScripts->itemWidget(listItem));

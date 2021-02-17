@@ -6,12 +6,12 @@ UdpSocket::UdpSocket(QObject *parent) : NetConnection(parent),
 {
     connect(m_udpSocket,&QUdpSocket::readyRead, this, &UdpSocket::onSocketReadyRead);
 
-    qDebug()<<"*UdpSocket";
+    qDebug() << Q_FUNC_INFO;
 }
 
 UdpSocket::~UdpSocket()
 {
-    qDebug()<<"~UdpSocket";
+    qDebug() << Q_FUNC_INFO;
 }
 
 void UdpSocket::closeSocket()
@@ -19,12 +19,12 @@ void UdpSocket::closeSocket()
     if (m_udpSocket->state() == QAbstractSocket::BoundState)
         m_udpSocket->close();
 
-    qDebug()<<"UdpSocket::closeSocket";
+    qDebug() << Q_FUNC_INFO;
 }
 
 void UdpSocket::start()
 {
-    qDebug()<<"UdpSocket::start";
+    qDebug() << Q_FUNC_INFO;
     closeSocket();
 
     const QString host = settings().value(KEY_HOST).toString();
@@ -52,7 +52,7 @@ void UdpSocket::start()
 
 void UdpSocket::stop()
 {
-    qDebug()<<"UdpSocket::stop";
+    qDebug() << Q_FUNC_INFO;
     closeSocket();
 
     emit stopped();
@@ -61,7 +61,7 @@ void UdpSocket::stop()
 
 void UdpSocket::sendDatagram(const QByteArray &data, const QString &host, quint16 port)
 {
-//    qDebug() << "UdpSocket::sendDatagram" << host << port << data;
+//    qDebug()  << Q_FUNC_INFO << host << port << data;
     m_udpSocket->writeDatagram(data,QHostAddress(host),port);
 }
 
@@ -77,7 +77,7 @@ void UdpSocket::onSocketReadyRead()
         m_udpSocket->readDatagram(data.data(), data.size(),
                                 &senderHost, &senderPort);
 
-//        qDebug() << "UdpSocket::onSocketReadyRead" << senderHost << senderPort << data;
+//        qDebug()  << Q_FUNC_INFO << senderHost << senderPort << data;
         emit datagram(data, QHostAddress(senderHost.toIPv4Address()).toString(), senderPort);
     }
 }

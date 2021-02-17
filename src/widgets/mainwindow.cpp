@@ -67,7 +67,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
 void MainWindow::addConnection(int type)
 {
-    qDebug()<<"MainWindow::addConnection, type:"<<CONNECTION_TYPES.at(type);
+    qDebug() << Q_FUNC_INFO<<CONNECTION_TYPES.at(type);
 
     QJsonObject defaultSettings = m_settings->getJsonObject(KEY_DEFAULT);
     QJsonObject jSettings = defaultSettings.value(CONNECTION_TYPES.at(type)).toObject();
@@ -76,7 +76,7 @@ void MainWindow::addConnection(int type)
 
 ConnectionWidget *MainWindow::createConnection(int type, const QJsonObject &settings)
 {
-    qDebug()<<"MainWindow::addConnection, type:"<<CONNECTION_TYPES.at(type);
+    qDebug() << Q_FUNC_INFO<<CONNECTION_TYPES.at(type);
 
     NetConnection *netConnection = Q_NULLPTR;
 
@@ -112,7 +112,7 @@ ConnectionWidget *MainWindow::createConnection(int type, const QJsonObject &sett
 
 void MainWindow::onTabCloseRequested(int index)
 {
-    qDebug()<<"MainWindow::onTabCloseRequested"<<index;
+    qDebug() << Q_FUNC_INFO<<index;
 
     if (!checkSessionChanges()) return;
     closeConnectionTab(index);
@@ -120,7 +120,7 @@ void MainWindow::onTabCloseRequested(int index)
 
 void MainWindow::closeConnectionTab(int index)
 {
-    qDebug()<<"MainWindow::closeConnectionTab"<<index;
+    qDebug() << Q_FUNC_INFO<<index;
 
     ConnectionWidget *widget = dynamic_cast<ConnectionWidget*>(ui->tabWidgetCentral->widget(index));
     NetConnection *netConnection = widget->netConnection();
@@ -188,7 +188,7 @@ void MainWindow::onScriptActionRequested()
 
 void MainWindow::closeAllTabs()
 {
-    qDebug()<<"MainWindow::closeAllTabs";
+    qDebug() << Q_FUNC_INFO;
 
     int tabsCount = ui->tabWidgetCentral->tabBar()->count();
     for (int i=0; i<tabsCount; ++i)
@@ -197,7 +197,7 @@ void MainWindow::closeAllTabs()
 
 bool MainWindow::checkSessionChanges()
 {
-    qDebug()<<"MainWindow::checkSessionChanges";
+    qDebug() << Q_FUNC_INFO;
     bool result = true;
     bool isConnectionsChanged = false;
     int tabsCount = ui->tabWidgetCentral->tabBar()->count();
@@ -248,7 +248,7 @@ bool MainWindow::checkSessionChanges()
 
 bool MainWindow::saveSession()
 {
-    qDebug()<<"MainWindow::saveSession";
+    qDebug() << Q_FUNC_INFO;
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save session"),
         m_sessionsDir + "/" + "session.ctses",
@@ -300,7 +300,7 @@ void MainWindow::loadSession()
 
     if (fileName.isEmpty()) return;
 
-    qDebug()<<"MainWindow::loadSession"<<fileName;
+    qDebug() << Q_FUNC_INFO<<fileName;
 
     openSession(fileName);
 }
@@ -338,7 +338,7 @@ void MainWindow::openSession(const QString &path)
 
 void MainWindow::updateRecentSessions(const QString &path)
 {
-    qDebug()<<"MainWindow::updateRecentSessions" << path;
+    qDebug() << Q_FUNC_INFO << path;
 
     if(!path.isEmpty())
     {
@@ -367,7 +367,7 @@ void MainWindow::onRecentSessionTriggered(QAction *action)
 {
     if (!action) return;
 
-    qDebug()<<"MainWindow::onRecentSessionTriggered" << action->text();
+    qDebug() << Q_FUNC_INFO << action->text();
 
     openSession(action->text());
 }

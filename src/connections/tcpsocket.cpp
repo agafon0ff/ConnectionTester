@@ -8,17 +8,17 @@ TcpSocket::TcpSocket(QObject *parent) : NetConnection(parent),
     connect(m_tcpSocket, &QTcpSocket::readyRead, this, &TcpSocket::onSocketReadyRead);
     connect(m_tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
 
-    qDebug()<<"*TcpSocket";
+    qDebug() << Q_FUNC_INFO;
 }
 
 TcpSocket::~TcpSocket()
 {
-    qDebug()<<"~TcpSocket";
+    qDebug() << Q_FUNC_INFO;
 }
 
 void TcpSocket::closeSocket()
 {
-    qDebug()<<"TcpSocket::closeSocket";
+    qDebug() << Q_FUNC_INFO;
 
     if(m_tcpSocket->state() == QTcpSocket::ConnectedState)
         m_tcpSocket->disconnectFromHost();
@@ -28,7 +28,7 @@ void TcpSocket::closeSocket()
 
 void TcpSocket::start()
 {
-    qDebug()<<"TcpSocket::start";
+    qDebug() << Q_FUNC_INFO;
 
     closeSocket();
 
@@ -53,7 +53,7 @@ void TcpSocket::start()
 
 void TcpSocket::stop()
 {
-    qDebug()<<"TcpSocket::stop";
+    qDebug() << Q_FUNC_INFO;
     closeSocket();
 }
 
@@ -90,7 +90,7 @@ void TcpSocket::onSocketReadyRead()
 
 void TcpSocket::onSocketError(QAbstractSocket::SocketError socketError)
 {
-    qDebug()<<"TcpSocket::onSocketError"<<socketError;
+    qDebug() << Q_FUNC_INFO<<socketError;
 
     switch (socketError)
     {

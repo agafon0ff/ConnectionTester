@@ -48,7 +48,7 @@ FORMS += \
 
 RC_FILE = res/connection.rc
 
-QMAKE_LFLAGS_RELEASE += -static -static-libgcc
+#QMAKE_LFLAGS_RELEASE += -static -static-libgcc
 
 # === build parameters ===
 win32: OS_SUFFIX = win32
