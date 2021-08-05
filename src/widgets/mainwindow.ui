@@ -49,7 +49,7 @@
      <x>0</x>
      <y>0</y>
      <width>655</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuNew">
@@ -89,9 +89,17 @@
     <addaction name="actionDublicateScript"/>
     <addaction name="actionScriptRemove"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="actionConnectionTester"/>
+    <addaction name="actionQtLibraryes"/>
+   </widget>
    <addaction name="menuNew"/>
    <addaction name="menuSession"/>
    <addaction name="menuScripts"/>
+   <addaction name="menuAbout"/>
   </widget>
   <action name="actionExit">
    <property name="icon">
@@ -213,6 +221,20 @@
    </property>
    <property name="text">
     <string>Serial Port</string>
+   </property>
+  </action>
+  <action name="actionConnectionTester">
+   <property name="icon">
+    <iconset resource="../../res/res.qrc">
+     <normaloff>:/connection.ico</normaloff>:/connection.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Connection Tester</string>
+   </property>
+  </action>
+  <action name="actionQtLibraryes">
+   <property name="text">
+    <string>Qt Libraries</string>
    </property>
   </action>
  </widget>

@@ -13,6 +13,7 @@
 #include <QPushButton>
 #include <QTabBar>
 #include <QDebug>
+#include <QStyle>
 #include <QFile>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -43,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionScriptLoad, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
     connect(ui->actionScriptSave, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
     connect(ui->actionScriptRemove, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
+
+    connect(ui->actionConnectionTester, &QAction::triggered, this, &MainWindow::onAboutActionRequested);
+    connect(ui->actionQtLibraryes, &QAction::triggered, [=]{QMessageBox::aboutQt(this, "About Qt Libraries");});
 
     loadSettings();
 }
@@ -184,6 +188,21 @@ void MainWindow::onScriptActionRequested()
         widget->onScriptDuplicate();
     else if (action->objectName() == "actionScriptRemove")
         widget->onScriptRemove();
+}
+
+void MainWindow::onAboutActionRequested()
+{
+    QMessageBox *msgBox = new QMessageBox(this);
+    msgBox->setWindowTitle(tr("About Connection Tester"));
+    msgBox->setText(tr("Connection Tester\n\nThis software is distributed under the GPL-3.0 license.\n\n"
+                       "Designed for testing and debugging network communication between applications.\n\n"
+                       "Contacts: \nEmail:  agafon0ff@mail.ru\n"
+                       "Github:  https://github.com/agafon0ff\n\n"
+                       "Current version: \nhttps://github.com/agafon0ff/ConnectionTester/releases/"));
+
+    msgBox->setIconPixmap(QPixmap(":/connection.ico"));
+    msgBox->exec();
+    delete msgBox;
 }
 
 void MainWindow::closeAllTabs()
@@ -425,4 +444,5 @@ void MainWindow::loadStyleSheet()
 
     setStyleSheet(m_styleString);
     m_scriptEditor->setStyleSheet(m_styleString);
+    ui->actionQtLibraryes->setIcon(style()->standardIcon(QStyle::SP_TitleBarMenuButton));
 }

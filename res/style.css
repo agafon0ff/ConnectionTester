@@ -501,14 +501,19 @@ QTextBrowser {
 
 /******** QFrame::HLine == 0x0004, QFrame::VLine == 0x0005 ********/
 QFrame[frameShape="4"] {
-    border-bottom: 1px solid #222;
+    border-bottom: 1 solid #222;
     background: none;
-    max-height: 1px;
+    max-height: 1;
 }
+
 QFrame[frameShape="5"] {
-    border-left: 1px solid #222;
+    border-left: 1 solid #222;
     background: none;
-    max-width: 1px;
+    max-width: 1;
+}
+
+QFrame:disabled[frameShape="4"]{
+    border-bottom: 1 solid #333;
 }
  
  /******** QScrollBar vertical *******/

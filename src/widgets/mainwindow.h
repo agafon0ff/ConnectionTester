@@ -36,10 +36,10 @@ private slots:
     void onTabCloseRequested(int index);
     void closeConnectionTab(int index);
 
-
     void setDefaultConnectionSettings(int type, const QJsonObject &settings);
     void onScriptsMenuRequested();
     void onScriptActionRequested();
+    void onAboutActionRequested();
 
     void closeAllTabs();
     bool checkSessionChanges();
