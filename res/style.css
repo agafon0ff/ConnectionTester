@@ -209,6 +209,7 @@ QListWidget::item:selected[border="true"]  {
 QTabWidget::pane {
     border: 1px solid #222;
     margin: 0px;
+    outline: none;
 }
 
 
@@ -218,6 +219,7 @@ QTabWidget::tab-bar {
     left: 4px;
     background-color: #aaa;
     margin: 1px;
+    outline: none;
 }
 QTabBar::tab {
     background-color: #222;
@@ -232,6 +234,7 @@ QTabBar::tab {
 QTabBar::tab:!selected:hover, QTabBar::tab:hover {
     background: #444;
     border: 1px solid #333;
+    outline: none;
 }
 
 QTabBar::tab:selected {

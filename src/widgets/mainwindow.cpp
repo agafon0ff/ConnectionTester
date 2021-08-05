@@ -444,5 +444,6 @@ void MainWindow::loadStyleSheet()
 
     setStyleSheet(m_styleString);
     m_scriptEditor->setStyleSheet(m_styleString);
+    ui->tabWidgetCentral->setFocusPolicy(Qt::NoFocus);
     ui->actionQtLibraryes->setIcon(style()->standardIcon(QStyle::SP_TitleBarMenuButton));
 }
