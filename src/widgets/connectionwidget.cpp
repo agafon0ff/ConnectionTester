@@ -318,6 +318,7 @@ void ConnectionWidget::onScriptEdit()
     connect(script, &ScriptItem::started, itemWidget, &ScriptItemWidget::onStarted);
     connect(script, &ScriptItem::stopped, itemWidget, &ScriptItemWidget::onStopped);
 
+    itemWidget->setButtonVisible(script->isStartPosable());
     m_isConnectionChanged = true;
 }
 
@@ -391,6 +392,7 @@ void ConnectionWidget::addScriptItem(const QString &name, const QString &text)
     connect(script, &ScriptItem::started, itemWidget, &ScriptItemWidget::onStarted);
     connect(script, &ScriptItem::stopped, itemWidget, &ScriptItemWidget::onStopped);
 
+    itemWidget->setButtonVisible(script->isStartPosable());
     m_isConnectionChanged = true;
 }
 

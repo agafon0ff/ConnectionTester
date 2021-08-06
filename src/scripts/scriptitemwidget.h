@@ -33,6 +33,8 @@ public slots:
     void onStarted();
     void onStopped();
 
+    void setButtonVisible(bool state);
+
     void setActive(bool state);
 };
 

@@ -57,6 +57,11 @@ void ScriptItemWidget::onStopped()
     m_isStarted = false;
 }
 
+void ScriptItemWidget::setButtonVisible(bool state)
+{
+    state ? m_btnStart->show() : m_btnStart->hide();
+}
+
 void ScriptItemWidget::setActive(bool state)
 {
     m_centralWidget->setProperty("active", state);

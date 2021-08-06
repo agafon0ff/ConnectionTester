@@ -206,6 +206,11 @@ void ScriptItem::stopScript()
         m_onScriptStopFunc.call();
 }
 
+bool ScriptItem::isStartPosable()
+{
+    return m_onScriptStartFunc.isFunction();
+}
+
 void ScriptItem::setDatagram(const QByteArray &data, const QString &host, quint16 port)
 {
     if (m_onReadTextFunc.isFunction())

@@ -66,6 +66,8 @@ public slots:
     void startScript();
     void stopScript();
 
+    bool isStartPosable();
+
     void setDatagram(const QByteArray &data, const QString &host, quint16 port);
     int addTimer(QScriptContext *context, bool loop);
     void removeTimer(int id);
