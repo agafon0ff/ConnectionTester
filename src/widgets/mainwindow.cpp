@@ -294,7 +294,7 @@ bool MainWindow::saveSession()
 
         QJsonArray jScriptsList;
         QStringList scriptNames = widget->scriptsNames();
-        foreach (const QString &key, scriptNames)
+        for (const QString &key: scriptNames)
         {
             QJsonObject jScript;
             jScript.insert(KEY_NAME, key);
@@ -334,7 +334,7 @@ void MainWindow::openSession(const QString &path)
 
     closeAllTabs();
     QJsonArray jSessionTabs = jSession.value(KEY_CONNECTIONS).toArray();
-    foreach (const QJsonValue &jValue, jSessionTabs)
+    for (const QJsonValue &jValue: jSessionTabs)
     {
         QJsonObject jConnection = jValue.toObject();
         QJsonObject jSettings = jConnection.value(KEY_SETTINGS).toObject();
@@ -343,7 +343,7 @@ void MainWindow::openSession(const QString &path)
         ConnectionWidget *widget = createConnection(CONNECTION_TYPES.indexOf(type), jSettings);
 
         QJsonArray jScriptsList = jConnection.value(KEY_SCRIPTS).toArray();
-        foreach (const QJsonValue &jSriptValue, jScriptsList)
+        for (const QJsonValue &jSriptValue: jScriptsList)
         {
             QJsonObject jScript = jSriptValue.toObject();
             QString name = jScript.value(KEY_NAME).toString();
@@ -373,12 +373,12 @@ void MainWindow::updateRecentSessions(const QString &path)
             m_recentSessions.removeLast();
     }
 
-    foreach (QAction *action, m_recentSessionActions)
+    for (QAction *action: m_recentSessionActions)
         ui->menuRecentSessions->removeAction(action);
 
     m_recentSessionActions.clear();
 
-    foreach (const QString &session, m_recentSessions)
+    for (const QString &session: m_recentSessions)
         m_recentSessionActions.append(ui->menuRecentSessions->addAction(session));
 }
 

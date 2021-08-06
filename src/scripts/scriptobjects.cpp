@@ -32,7 +32,7 @@ QScriptValue scriptFromJson(const QJsonValue &value, QScriptEngine *engine)
         QJsonObject jObject = value.toObject();
         QScriptValue sObject = engine->newObject();
 
-        foreach (const QString &key, jObject.keys())
+        for (const QString &key: jObject.keys())
         {
             QJsonValue jValue = jObject.value(key);
             sObject.setProperty(key, scriptFromJson(jValue, engine));

@@ -76,7 +76,7 @@ QStringList SerialPort::availablePorts()
     const QList<QSerialPortInfo> &ports = QSerialPortInfo::availablePorts();
     QStringList result;
 
-    foreach (const QSerialPortInfo &port, ports)
+    for (const QSerialPortInfo &port: ports)
         result.append(port.portName());
 
     return result;

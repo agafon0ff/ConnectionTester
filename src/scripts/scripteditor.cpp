@@ -96,7 +96,7 @@ void ScriptEditor::readTemplatesFile()
     m_menuTemplates->clear();
     QString key, value;
 
-    foreach (QString line, lines)
+    for (QString line: qAsConst(lines))
     {
         if(line.contains("/* "))
         {
@@ -128,13 +128,13 @@ Highlighter::Highlighter(QTextDocument *parent)
     QStringList keywords = { "class", "var", "let", "new", "return", "if",
                              "else", "break", "true", "false", "function"};
 
-    foreach (const QString &key, keywords)
+    for (const QString &key: keywords)
         addRule("\\b" + key + "\\b", QBrush("#9BC3D4"));
 
     QStringList operators = {"=", "==", "!=", "<", "<=", ">", ">=","\\+", "-", "\\*", "/", "//", "\\%", "\\*\\*",
                             "\\+=", "-=", "\\*=", "/=", "\\%=","\\^", "\\|", "\\&", "\\~", ">>", "<<" };
 
-    foreach (const QString &key, operators)
+    for (const QString &key: operators)
         addRule(key, QBrush("#CFC5d3"));
 
     addRule("\\b[A-Za-z0-9_]+(?=\\()", QBrush("#ddca7e"));
@@ -152,7 +152,8 @@ Highlighter::Highlighter(QTextDocument *parent)
 
 void Highlighter::highlightBlock(const QString &text)
 {
-    foreach (const HighlightingRule &rule, highlightingRules) {
+    for (const HighlightingRule &rule: qAsConst(highlightingRules))
+    {
         QRegExp expression(rule.pattern);
         int index = expression.indexIn(text);
         while (index >= 0) {

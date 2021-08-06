@@ -111,8 +111,9 @@ ScriptItem::ScriptItem(QObject *parent) :
 
 ScriptItem::~ScriptItem()
 {
-    foreach (int key, m_timeoutMap.keys())
-        killTimer(key);
+    QMapIterator<int, TimeoutStruct> it(m_timeoutMap);
+    while (it.hasNext())
+    { it.next();  killTimer(it.key()); }
 
     m_timeoutMap.clear();
 

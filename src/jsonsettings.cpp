@@ -62,12 +62,11 @@ QJsonObject JsonSettings::getJsonObject(const QString &key, const QJsonObject &d
 
 void JsonSettings::setParameters(const QMap<QString, QVariant> parameters)
 {
-    foreach(QString key, parameters.keys())
+    QMapIterator<QString, QVariant> it(parameters);
+    while (it.hasNext())
     {
-        if(m_jsonSettings.contains(key))
-            m_jsonSettings.remove(key);
-
-        m_jsonSettings.insert(key,QJsonValue::fromVariant(parameters.value(key)));
+        it.next();
+        m_jsonSettings[it.key()] = QJsonValue::fromVariant(parameters.value(it.key()));
     }
 
     saveJson(FILE_CONFIG,m_jsonSettings);
