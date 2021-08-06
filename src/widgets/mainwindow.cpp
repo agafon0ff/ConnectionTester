@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionScriptEdit, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
     connect(ui->actionScriptLoad, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
     connect(ui->actionScriptSave, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
+    connect(ui->actionDublicateScript, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
     connect(ui->actionScriptRemove, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
 
     connect(ui->actionConnectionTester, &QAction::triggered, this, &MainWindow::onAboutActionRequested);
