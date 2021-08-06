@@ -65,7 +65,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidgetSettings">
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="pageTcpServer">
          <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1">

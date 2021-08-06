@@ -27,8 +27,8 @@ void UdpSocket::start()
     qDebug() << Q_FUNC_INFO;
     closeSocket();
 
-    const QString host = settings().value(KEY_HOST).toString();
-    const quint16 port = static_cast<quint16>(settings().value(KEY_PORT).toInt());
+    const QString &&host = settings().value(KEY_HOST).toString();
+    const quint16 &&port = static_cast<quint16>(settings().value(KEY_PORT).toInt());
 
     if (m_udpSocket->bind(QHostAddress::AnyIPv4, port,
                          QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint))
@@ -61,8 +61,14 @@ void UdpSocket::stop()
 
 void UdpSocket::sendDatagram(const QByteArray &data, const QString &host, quint16 port)
 {
-//    qDebug()  << Q_FUNC_INFO << host << port << data;
-    m_udpSocket->writeDatagram(data,QHostAddress(host),port);
+    if (!host.isEmpty() && port)
+        m_udpSocket->writeDatagram(data, QHostAddress(host), port);
+    else
+    {
+        const QString &&hostDst = settings().value(KEY_HOST_DST).toString();
+        const quint16 &&portDst = static_cast<quint16>(settings().value(KEY_PORT_DST).toInt());
+        m_udpSocket->writeDatagram(data,QHostAddress(hostDst), portDst);
+    }
 }
 
 void UdpSocket::onSocketReadyRead()

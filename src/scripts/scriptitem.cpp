@@ -37,7 +37,7 @@ QScriptValue onWriteText(QScriptContext *context, QScriptEngine *engine)
                          context->argument(1).toString(),
                          static_cast<quint16>(context->argument(2).toString().toInt()));
     }
-    else script->datagram(context->argument(0).toString().toUtf8(), "", 1235);
+    else script->datagram(context->argument(0).toString().toUtf8(), "", 0);
 
     return QScriptValue();
 }
