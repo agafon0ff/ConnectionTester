@@ -114,13 +114,13 @@ void ConnectionWidget::setNetConnection(NetConnection *pointer)
 
     m_netConnection = pointer;
 
-    connect(m_netConnection, &NetConnection::started,
+    connect(m_netConnection, &NetConnection::started, this,
             [=]{ui->btnStart->setIcon(QIcon(":/icon_stop.png")); ui->btnStart->setText(KEY_STOP);});
 
-    connect(m_netConnection, &NetConnection::stopped,
+    connect(m_netConnection, &NetConnection::stopped, this,
             [=]{ui->btnStart->setIcon(QIcon(":/icon_play.png")); ui->btnStart->setText(KEY_START);});
 
-    connect(ui->btnStart, &QPushButton::clicked,
+    connect(ui->btnStart, &QPushButton::clicked, this,
             [=]{ui->btnStart->text() == KEY_START ? m_netConnection->start() : m_netConnection->stop();});
 
     connect(m_netConnection, &NetConnection::status, this, &ConnectionWidget::setStatusMessage);
@@ -229,7 +229,7 @@ void ConnectionWidget::onScriptLoad()
     }
     else
     {
-        QFileInfo fInfo(fileName);
+        fInfo = QFileInfo(fileName);
         scriptName = fInfo.fileName();
         scriptName.remove(".js");
     }

@@ -29,7 +29,7 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     m_highlighter = new Highlighter(ui->textEdit->document());
 
     connect(ui->btnOk, &QPushButton::clicked, this, &ScriptEditor::onBtnOkClicked);
-    connect(ui->btnCancel, &QPushButton::clicked, [=]{reject();});
+    connect(ui->btnCancel, &QPushButton::clicked, this, [=]{reject();});
     connect(ui->btnClear, &QPushButton::clicked, this, &ScriptEditor::clear);
     connect(ui->btnTemplates, &QPushButton::clicked, this, &ScriptEditor::onBtnTemplatesClicked);
 }
@@ -129,21 +129,21 @@ Highlighter::Highlighter(QTextDocument *parent)
                              "else", "break", "true", "false", "function"};
 
     for (const QString &key: keywords)
-        addRule("\\b" + key + "\\b", QBrush("#9BC3D4"));
+        addRule("\\b" + key + "\\b", QBrush(QColor(0x9b, 0xc3, 0x4d)));
 
     QStringList operators = {"=", "==", "!=", "<", "<=", ">", ">=","\\+", "-", "\\*", "/", "//", "\\%", "\\*\\*",
                             "\\+=", "-=", "\\*=", "/=", "\\%=","\\^", "\\|", "\\&", "\\~", ">>", "<<" };
 
     for (const QString &key: operators)
-        addRule(key, QBrush("#CFC5d3"));
+        addRule(key, QBrush(QColor(0xcf, 0xc5, 0xd3)));
 
-    addRule("\\b[A-Za-z0-9_]+(?=\\()", QBrush("#ddca7e"));
-    addRule("\\b[+-]?[0-9]+[lL]?\\b", QBrush("#CFA790"));
-    addRule("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b", QBrush("#CFA790"));
-    addRule("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b", QBrush("#CFA790"));
-    addRule("//[^\n]*", QBrush("#567790"));
-    addRule("\"([^\"\"]*)\"", QBrush("#A6D49B"));
-    addRule("'([^'']*)'", QBrush("#A6D49B"));
+    addRule("\\b[A-Za-z0-9_]+(?=\\()", QBrush(QColor(0xdd, 0xca, 0x7e)));
+    addRule("\\b[+-]?[0-9]+[lL]?\\b", QBrush(QColor(0xcf, 0xa7, 0x90)));
+    addRule("\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b", QBrush(QColor(0xcf, 0xa7, 0x90)));
+    addRule("\\b[+-]?[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b", QBrush(QColor(0xcf, 0xa7, 0x90)));
+    addRule("//[^\n]*", QBrush(QColor(0x56, 0x77, 0x90)));
+    addRule("\"([^\"\"]*)\"", QBrush(QColor(0xa6, 0xd4, 0x9b)));
+    addRule("'([^'']*)'", QBrush(QColor(0xa6, 0xd4, 0x9b)));
 
     multiLineCommentFormat.setForeground(Qt::red);
     commentStartExpression = QRegExp("/\\*");

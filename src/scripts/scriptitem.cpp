@@ -7,7 +7,7 @@ QScriptValue onScriptStarted(QScriptContext *context, QScriptEngine *engine)
     Q_UNUSED(context);
 
     ScriptItem *script = dynamic_cast<ScriptItem*>(engine->parent());
-    if (script) script->started();
+    if (script) emit script->started();
 
     return QScriptValue();
 }
@@ -17,7 +17,7 @@ QScriptValue onScriptStopped(QScriptContext *context, QScriptEngine *engine)
     Q_UNUSED(context);
 
     ScriptItem *script = dynamic_cast<ScriptItem*>(engine->parent());
-    if (script) script->stopped();
+    if (script) emit script->stopped();
 
     return QScriptValue();
 }
@@ -33,11 +33,11 @@ QScriptValue onWriteText(QScriptContext *context, QScriptEngine *engine)
 
     if(context->argumentCount() == 3)
     {
-        script->datagram(context->argument(0).toString().toUtf8(),
+        emit script->datagram(context->argument(0).toString().toUtf8(),
                          context->argument(1).toString(),
                          static_cast<quint16>(context->argument(2).toString().toInt()));
     }
-    else script->datagram(context->argument(0).toString().toUtf8(), "", 0);
+    else emit script->datagram(context->argument(0).toString().toUtf8(), "", 0);
 
     return QScriptValue();
 }
@@ -54,10 +54,10 @@ QScriptValue onWriteData(QScriptContext *context, QScriptEngine *engine)
 
     if(context->argumentCount() == 3)
     {
-        script->datagram(data, context->argument(1).toString(),
+        emit script->datagram(data, context->argument(1).toString(),
                          static_cast<quint16>(context->argument(2).toString().toInt()));
     }
-    else script->datagram(data, "", 1235);
+    else emit script->datagram(data, "", 1235);
 
     return QScriptValue();
 }
@@ -104,7 +104,7 @@ ScriptItem::ScriptItem(QObject *parent) :
     m_jsConsole(new JsConsole),
     m_jsJson(new JsJSON(m_engine))
 {
-    connect(m_jsConsole, &JsConsole::logMessage,
+    connect(m_jsConsole, &JsConsole::logMessage, this,
             [=](const QString &text){emit status(text, StatusType::StatusInput);});
     connect(m_jsConsole, &JsConsole::clearText, this, &ScriptItem::clearText);
 }

@@ -32,7 +32,7 @@ void ScriptItemWidget::initWidget()
     m_btnStart->setIcon(QIcon(":/icon_play.png"));
     horizontalLayout->addWidget(m_btnStart);
 
-    connect(m_btnStart, &QToolButton::clicked, [=]{m_isStarted ? emit stopClicked() : emit startClicked();});
+    connect(m_btnStart, &QToolButton::clicked, this, [=]{m_isStarted ? emit stopClicked() : emit startClicked();});
 }
 
 void ScriptItemWidget::setName(const QString &name)

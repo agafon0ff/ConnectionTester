@@ -25,8 +25,12 @@ void TcpServer::closeServer()
 
         disconnect(m_tcpServer, &QTcpServer::newConnection, this, &TcpServer::onSocketConnected);
 
-        for (int i=0; i<m_tcpSockets.size(); ++i)
-            m_tcpSockets.values().at(i)->disconnectFromHost();
+        QMapIterator<QString, QTcpSocket*> it(m_tcpSockets);
+        while (it.hasNext())
+        {
+            it.next();
+            it.value()->disconnectFromHost();
+        }
 
         m_tcpServer->close();
         m_tcpSockets.clear();

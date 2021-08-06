@@ -33,10 +33,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setAcceptDrops(true);
 
     connect(ui->tabWidgetCentral, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabCloseRequested);
-    connect(ui->actionTcpServer, &QAction::triggered, [=]{addConnection(ConnectionTcpServer);});
-    connect(ui->actionTcpSocket, &QAction::triggered, [=]{addConnection(ConnectionTcpSocket);});
-    connect(ui->actionUdpSocket, &QAction::triggered, [=]{addConnection(ConnectionUdpSocket);});
-    connect(ui->actionSerialPort, &QAction::triggered, [=]{addConnection(ConnectionSerialPort);});
+    connect(ui->actionTcpServer, &QAction::triggered, this, [=]{addConnection(ConnectionTcpServer);});
+    connect(ui->actionTcpSocket, &QAction::triggered, this, [=]{addConnection(ConnectionTcpSocket);});
+    connect(ui->actionUdpSocket, &QAction::triggered, this, [=]{addConnection(ConnectionUdpSocket);});
+    connect(ui->actionSerialPort, &QAction::triggered, this, [=]{addConnection(ConnectionSerialPort);});
     connect(ui->actionSessionSave, &QAction::triggered, this, &MainWindow::saveSession);
     connect(ui->actionSessionLoad, &QAction::triggered, this, &MainWindow::loadSession);
     connect(ui->menuRecentSessions, &QMenu::triggered, this, &MainWindow::onRecentSessionTriggered);
@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionScriptRemove, &QAction::triggered, this, &MainWindow::onScriptActionRequested);
 
     connect(ui->actionConnectionTester, &QAction::triggered, this, &MainWindow::onAboutActionRequested);
-    connect(ui->actionQtLibraryes, &QAction::triggered, [=]{QMessageBox::aboutQt(this, "About Qt Libraries");});
+    connect(ui->actionQtLibraryes, &QAction::triggered, this, [=]{QMessageBox::aboutQt(this, "About Qt Libraries");});
 
     loadSettings();
 }
@@ -331,7 +331,7 @@ bool MainWindow::saveSession()
         jConnection.insert(KEY_SETTINGS, widget->settings());
 
         QJsonArray jScriptsList;
-        QStringList scriptNames = widget->scriptsNames();
+        const QStringList &scriptNames = widget->scriptsNames();
         for (const QString &key: scriptNames)
         {
             QJsonObject jScript;
@@ -371,8 +371,8 @@ void MainWindow::openSession(const QString &path)
     if (!jSession.contains(KEY_CONNECTIONS)) return;
 
     closeAllTabs();
-    QJsonArray jSessionTabs = jSession.value(KEY_CONNECTIONS).toArray();
-    for (const QJsonValue &jValue: jSessionTabs)
+    QJsonArray &&jSessionTabs = jSession.value(KEY_CONNECTIONS).toArray();
+    for (const QJsonValue &jValue: qAsConst(jSessionTabs))
     {
         QJsonObject jConnection = jValue.toObject();
         QJsonObject jSettings = jConnection.value(KEY_SETTINGS).toObject();
@@ -380,8 +380,8 @@ void MainWindow::openSession(const QString &path)
 
         ConnectionWidget *widget = createConnection(CONNECTION_TYPES.indexOf(type), jSettings);
 
-        QJsonArray jScriptsList = jConnection.value(KEY_SCRIPTS).toArray();
-        for (const QJsonValue &jSriptValue: jScriptsList)
+        QJsonArray &&jScriptsList = jConnection.value(KEY_SCRIPTS).toArray();
+        for (const QJsonValue &jSriptValue: qAsConst(jScriptsList))
         {
             QJsonObject jScript = jSriptValue.toObject();
             QString name = jScript.value(KEY_NAME).toString();
@@ -411,12 +411,12 @@ void MainWindow::updateRecentSessions(const QString &path)
             m_recentSessions.removeLast();
     }
 
-    for (QAction *action: m_recentSessionActions)
+    for (QAction *action: qAsConst(m_recentSessionActions))
         ui->menuRecentSessions->removeAction(action);
 
     m_recentSessionActions.clear();
 
-    for (const QString &session: m_recentSessions)
+    for (const QString &session: qAsConst(m_recentSessions))
         m_recentSessionActions.append(ui->menuRecentSessions->addAction(session));
 }
 

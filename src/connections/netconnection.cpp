@@ -7,12 +7,13 @@ NetConnection::NetConnection(QObject *parent):QObject(parent)
 
 NetConnection::~NetConnection()
 {
-    for(int i=0;i<m_scriptsMap.size();++i)
+    QMapIterator<QString, ScriptItem*> it(m_scriptsMap);
+    while (it.hasNext())
     {
-        ScriptItem *script = m_scriptsMap.values().at(i);
-        script->clearScript();
-        script->disconnect();
-        delete script;
+        it.next();
+        it.value()->clearScript();
+        it.value()->disconnect();
+        delete it.value();
     }
 
     m_scriptsMap.clear();
