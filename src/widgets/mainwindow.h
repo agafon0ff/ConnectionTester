@@ -29,6 +29,8 @@ private:
     QList<QAction*> m_recentSessionActions;
 
     void closeEvent(QCloseEvent *e);
+    void dropEvent(QDropEvent *e);
+    void dragEnterEvent(QDragEnterEvent *e);
 
 private slots:
     void addConnection(int type);

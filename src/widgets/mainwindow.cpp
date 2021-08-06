@@ -11,6 +11,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPushButton>
+#include <QDropEvent>
+#include <QMimeData>
 #include <QTabBar>
 #include <QDebug>
 #include <QStyle>
@@ -28,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFont();
     loadStyleSheet();
     setWindowIcon(QIcon(":/connection.ico"));
+    setAcceptDrops(true);
 
     connect(ui->tabWidgetCentral, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabCloseRequested);
     connect(ui->actionTcpServer, &QAction::triggered, [=]{addConnection(ConnectionTcpServer);});
@@ -69,9 +72,36 @@ void MainWindow::closeEvent(QCloseEvent *e)
     e->accept();
 }
 
+void MainWindow::dropEvent(QDropEvent *e)
+{
+    const QMimeData* mimeData = e->mimeData();
+
+    if (!mimeData->hasUrls()) return;
+
+    QList<QUrl> urlList = mimeData->urls();
+    if (urlList.isEmpty()) return;
+
+    openSession(urlList.at(0).toLocalFile());
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *e)
+{
+    const QMimeData* mimeData = e->mimeData();
+
+    if (!mimeData->hasUrls()) return;
+
+    QList<QUrl> urlList = mimeData->urls();
+    if (urlList.isEmpty()) return;
+
+    QFileInfo fInfo(urlList.at(0).toLocalFile());
+
+    if (fInfo.suffix() == "ctses")
+        e->acceptProposedAction();
+}
+
 void MainWindow::addConnection(int type)
 {
-    qDebug() << Q_FUNC_INFO<<CONNECTION_TYPES.at(type);
+    qDebug() << Q_FUNC_INFO << CONNECTION_TYPES.at(type);
 
     QJsonObject defaultSettings = m_settings->getJsonObject(KEY_DEFAULT);
     QJsonObject jSettings = defaultSettings.value(CONNECTION_TYPES.at(type)).toObject();
