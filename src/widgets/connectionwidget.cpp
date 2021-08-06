@@ -36,7 +36,7 @@ ConnectionWidget::ConnectionWidget(QWidget *parent) :
     font.setFamily("Courier");
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
-    font.setPointSize(9);
+    font.setPointSize(10);
     QFontMetrics metrics(font);
 
     ui->textEditOutput->setFont(font);

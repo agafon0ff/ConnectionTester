@@ -464,7 +464,7 @@ void MainWindow::loadFont()
 #ifdef Q_OS_UNIX
     int id = QFontDatabase::addApplicationFont(":/Ubuntu-L.ttf");
     QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-    QFont  font = QFont(family,10,QFont::Normal);
+    QFont  font = QFont(family,11,QFont::Normal);
     font.setPixelSize(13);
     QApplication::setFont(font);
 #endif

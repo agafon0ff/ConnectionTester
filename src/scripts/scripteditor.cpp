@@ -15,7 +15,7 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     font.setFamily("Courier");
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
-    font.setPointSize(10);
+    font.setPointSize(11);
     QFontMetrics metrics(font);
     ui->textEdit->setFont(font);
 
@@ -129,7 +129,7 @@ Highlighter::Highlighter(QTextDocument *parent)
                              "else", "break", "true", "false", "function"};
 
     for (const QString &key: keywords)
-        addRule("\\b" + key + "\\b", QBrush(QColor(0x9b, 0xc3, 0x4d)));
+        addRule("\\b" + key + "\\b", QBrush(QColor(0x9b, 0xc3, 0xd4)));
 
     QStringList operators = {"=", "==", "!=", "<", "<=", ">", ">=","\\+", "-", "\\*", "/", "//", "\\%", "\\*\\*",
                             "\\+=", "-=", "\\*=", "/=", "\\%=","\\^", "\\|", "\\&", "\\~", ">>", "<<" };
