@@ -15,7 +15,13 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     font.setFamily("Courier");
     font.setStyleHint(QFont::Monospace);
     font.setFixedPitch(true);
+
+#ifdef Q_OS_WIN
+    font.setPointSize(10);
+#else
     font.setPointSize(11);
+#endif // Q_OS_WIN
+
     QFontMetrics metrics(font);
     ui->textEdit->setFont(font);
 

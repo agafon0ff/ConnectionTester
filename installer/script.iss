@@ -1,5 +1,5 @@
 #define MyAppName "Connection Tester"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1.1"
 #define MyAppPublisher "Sergey Agafonov"
 #define MyAppURL "https://github.com/agafon0ff/ConnectionTester"
 #define MyAppExeName "ConnectionTester.exe"
@@ -22,6 +22,7 @@ OutputBaseFilename=ConnectionTesterSetup
 SetupIconFile=F:\projects\qt\ConnectionTester\res\connection.ico
 Compression=lzma
 SolidCompression=yes
+ChangesAssociations = yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Languages\English.isl"
@@ -40,3 +41,9 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, "&", "&&")}}"; Flags: nowait postinstall skipifsilent
+
+[Registry]
+Root: HKCR; Subkey: ".ctses";                          ValueData: "{#MyAppName}";          Flags: uninsdeletevalue; ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}";                    ValueData: "Program {#MyAppName}";  Flags: uninsdeletekey;   ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}\DefaultIcon";        ValueData: "{app}\{#MyAppExeName},0";               ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}\shell\open\command"; ValueData: """{app}\{#MyAppExeName}"" ""%1""";  ValueType: string;  ValueName: ""
