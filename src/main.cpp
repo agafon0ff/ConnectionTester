@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
     signal(SIGQUIT, signalHandler);
 #endif // Q_OS_WIN
 
-
     QApplication a(argc, argv);
     MainWindow w;
     w.setWindowTitle(QObject::tr("Connection Tester (v.1.1.1)"));

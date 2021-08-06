@@ -53,6 +53,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionQtLibraryes, &QAction::triggered, this, [=]{QMessageBox::aboutQt(this, "About Qt Libraries");});
 
     loadSettings();
+
+    QStringList &&args = QApplication::instance()->arguments();
+    if (args.size() > 1) openSession(args.at(1));
 }
 
 MainWindow::~MainWindow()
