@@ -161,7 +161,7 @@ void ConnectionWidget::setSettings(const QJsonObject &settings)
     }
 
     ui->checkBoxAutoStart->setChecked(settings.value(KEY_AUTO_START).toBool());
-    ui->checkBoxShowText->setChecked(settings.value(KEY_SHOW_TEXT).toBool());
+    ui->checkBoxShowText->setChecked(settings.value(KEY_SHOW_TEXT).toBool(true));
     ui->checkBoxShowHex->setChecked(settings.value(KEY_SHOW_HEX).toBool());
     ui->checkBoxAddNewLine->setChecked(settings.value(KEY_ADD_NEW_LINE).toBool());
 
