@@ -222,13 +222,20 @@ void MainWindow::onScriptActionRequested()
 
 void MainWindow::onAboutActionRequested()
 {
+    QString text = tr("<h3>Connection Tester</h3>\n\n"
+                       "<p>This software is distributed under the GPL-3.0 license.</p>"
+                       "<p>Designed for testing and debugging network communication between applications.</p>");
+
+    QString contacts = tr("<p>Contacts:</p><p>Email:  agafon0ff@mail.ru</p>"
+                       "<p>Github: <a href=\"https://%1/\">%1</a></p>"
+                       "<p>Current version: <a href=\"https://%2/\">ConnectionTester/releases</a></p>").
+            arg(QStringLiteral("github.com/agafon0ff"),
+                QStringLiteral("github.com/agafon0ff/ConnectionTester/releases/"));
+
     QMessageBox *msgBox = new QMessageBox(this);
     msgBox->setWindowTitle(tr("About Connection Tester"));
-    msgBox->setText(tr("Connection Tester\n\nThis software is distributed under the GPL-3.0 license.\n\n"
-                       "Designed for testing and debugging network communication between applications.\n\n"
-                       "Contacts: \nEmail:  agafon0ff@mail.ru\n"
-                       "Github:  https://github.com/agafon0ff\n\n"
-                       "Current version: \nhttps://github.com/agafon0ff/ConnectionTester/releases/"));
+    msgBox->setText(text);
+    msgBox->setInformativeText(contacts);
 
     msgBox->setIconPixmap(QPixmap(":/connection.ico"));
     msgBox->exec();
