@@ -2,6 +2,8 @@
 #include "ui_scripteditor.h"
 #include <QDebug>
 #include <QAction>
+#include <QToolTip>
+#include <QScriptEngine>
 
 ScriptEditor::ScriptEditor(QWidget *parent) :
     QDialog(parent),
@@ -38,6 +40,7 @@ ScriptEditor::ScriptEditor(QWidget *parent) :
     connect(ui->btnCancel, &QPushButton::clicked, this, [=]{reject();});
     connect(ui->btnClear, &QPushButton::clicked, this, &ScriptEditor::clear);
     connect(ui->btnTemplates, &QPushButton::clicked, this, &ScriptEditor::onBtnTemplatesClicked);
+    connect(ui->textEdit, &QPlainTextEdit::textChanged, this, &ScriptEditor::onScriptTextChanged);
 }
 
 ScriptEditor::~ScriptEditor()
@@ -54,7 +57,7 @@ void ScriptEditor::setScriptName(const QString &text)
 
 void ScriptEditor::setScriptText(const QString &text)
 {
-    ui->textEdit->setText(text);
+    ui->textEdit->setPlainText(text);
 }
 
 void ScriptEditor::clear()
@@ -71,7 +74,7 @@ void ScriptEditor::onBtnOkClicked()
         return;
 
     m_scriptText = ui->textEdit->toPlainText();
-    accept();
+    if (checkSyntax()) accept();
 }
 
 void ScriptEditor::onBtnTemplatesClicked()
@@ -80,7 +83,13 @@ void ScriptEditor::onBtnTemplatesClicked()
     if (!action) return;
 
     if(m_templatesMap.contains(action->text()))
-        ui->textEdit->append(m_templatesMap.value(action->text()));
+        ui->textEdit->appendPlainText(m_templatesMap.value(action->text()));
+}
+
+void ScriptEditor::onScriptTextChanged()
+{
+    if (!ui->textEdit->extraSelections().isEmpty())
+        ui->textEdit->setExtraSelections({});
 }
 
 void ScriptEditor::readTemplatesFile()
@@ -124,6 +133,27 @@ void ScriptEditor::readTemplatesFile()
 
     m_templatesMap.insert(key, value);
     m_menuTemplates->addAction(key);
+}
+
+bool ScriptEditor::checkSyntax()
+{
+    QScriptSyntaxCheckResult result = QScriptEngine::checkSyntax(m_scriptText);
+    if (result.state() != QScriptSyntaxCheckResult::Valid)
+    {
+        QTextEdit::ExtraSelection selection;
+        selection.format.setBackground(QColor(255, 0, 0, 120));
+        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+        selection.cursor = ui->textEdit->textCursor();
+        selection.cursor.clearSelection();
+        selection.cursor.setPosition(0, QTextCursor::MoveAnchor);
+        selection.cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, result.errorLineNumber() - 1);
+        ui->textEdit->setExtraSelections({selection});
+
+        QToolTip::showText(mapToGlobal(ui->textEdit->cursorRect(selection.cursor).topRight()),
+                           result.errorMessage(), ui->textEdit);
+    }
+
+    return result.state() == QScriptSyntaxCheckResult::Valid;
 }
 
 // ********************************************************************************

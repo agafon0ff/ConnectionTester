@@ -37,7 +37,9 @@ private:
 private slots:
     void onBtnOkClicked();
     void onBtnTemplatesClicked();
+    void onScriptTextChanged();
     void readTemplatesFile();
+    bool checkSyntax();
 };
 
 // ********************************************************************************

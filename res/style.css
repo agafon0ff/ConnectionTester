@@ -131,6 +131,14 @@ QTextEdit {
     padding: 0px;
 }
 
+QPlainTextEdit {
+    background: #333;
+    border: 1px solid #222;
+    border-radius: 2px;
+    color: #E2E2C4;
+    padding: 0px;
+}
+
 QGroupBox {
     background-color: none;
     border: 1px solid #222;
