@@ -2,6 +2,7 @@ QT  += core gui widgets network websockets serialport script
 
 TARGET = ConnectionTester
 TEMPLATE = app
+QMAKE_LFLAGS += -no-pie
 
 CONFIG += c++14
 
