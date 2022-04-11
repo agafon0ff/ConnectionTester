@@ -115,10 +115,18 @@ void ConnectionWidget::setNetConnection(NetConnection *pointer)
     m_netConnection = pointer;
 
     connect(m_netConnection, &NetConnection::started, this,
-            [=]{ui->btnStart->setIcon(QIcon(":/icon_stop.png")); ui->btnStart->setText(KEY_STOP);});
+            [=]{
+        ui->btnStart->setIcon(QIcon(":/icon_stop.png"));
+        ui->btnStart->setText(KEY_STOP);
+        ui->stackedWidgetSettings->setEnabled(false);
+    });
 
     connect(m_netConnection, &NetConnection::stopped, this,
-            [=]{ui->btnStart->setIcon(QIcon(":/icon_play.png")); ui->btnStart->setText(KEY_START);});
+            [=]{
+        ui->btnStart->setIcon(QIcon(":/icon_play.png"));
+        ui->btnStart->setText(KEY_START);
+        ui->stackedWidgetSettings->setEnabled(true);
+    });
 
     connect(ui->btnStart, &QPushButton::clicked, this,
             [=]{ui->btnStart->text() == KEY_START ? m_netConnection->start() : m_netConnection->stop();});

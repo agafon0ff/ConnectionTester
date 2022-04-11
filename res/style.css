@@ -62,7 +62,7 @@ QLabel {
 }
 
 QLabel:disabled {
-    color: #444;
+    color: #bbb;
 }
 
 QPushButton {
@@ -121,6 +121,7 @@ QLineEdit {
 QLineEdit:disabled {
     background: #444;
     border: 1px solid #333;
+    color: #bbb;
 }
 
 QTextEdit {
@@ -376,11 +377,17 @@ QCheckBox {
 QCheckBox:disabled{
     background-color: none;
     border: 0px solid gray;
+    color: #bbb;
 }
-QCheckBox::indicator:disabled, QCheckBox::indicator:checked:disabled {
+QCheckBox::indicator:disabled{
     background-color: none;
-    border: 1px solid #111;
+    border: 1px solid #333;
     image: none;
+}
+QCheckBox::indicator:checked:disabled {
+    background-color: none;
+    border: 1px solid #333;
+    image: url(:/icon_check.png);
 }
 QCheckBox::indicator {
     background-color: none;
